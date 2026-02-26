@@ -1,0 +1,299 @@
+export type Language = 'en' | 'fr' | 'ar';
+
+export const translations: Record<Language, Record<string, string>> = {
+  en: {
+    dashboard: 'Dashboard',
+    products: 'Products',
+    sales: 'Sales',
+    customerDebts: 'Customer Debts',
+    supplierDebts: 'Supplier Debts',
+    settings: 'Settings',
+    language: 'Language',
+    currency: 'Currency',
+    
+    // Dashboard
+    totalRevenue: 'Total Revenue',
+    totalProfit: 'Total Profit',
+    productsInStock: 'Products in Stock',
+    stockValue: 'Stock Value',
+    salesTrend: 'Sales Trend',
+    
+    // Products
+    productName: 'Product Name',
+    price: 'Price',
+    quantity: 'Quantity',
+    unit: 'Unit',
+    image: 'Image',
+    measurement: 'Measurement',
+    addProduct: 'Add Product',
+    editProduct: 'Edit Product',
+    deleteProduct: 'Delete Product',
+    uploadImage: 'Upload Image',
+    noImage: 'No Image',
+    meter: 'Meter (m)',
+    piece: 'Piece',
+    manageProducts: 'Manage your product inventory',
+    purchase: 'Purchase',
+    selling: 'Selling',
+    
+    // Sales
+    saleDate: 'Sale Date',
+    customer: 'Customer',
+    product: 'Product',
+    quantity: 'Quantity',
+    unitPrice: 'Unit Price',
+    totalPrice: 'Total Price',
+    profit: 'Profit',
+    addSale: 'Add Sale',
+    editSale: 'Edit Sale',
+    deleteSale: 'Delete Sale',
+    
+    // Debts
+    name: 'Name',
+    amount: 'Amount',
+    status: 'Status',
+    paid: 'Paid',
+    unpaid: 'Unpaid',
+    partiallyPaid: 'Partially Paid',
+    addDebt: 'Add Debt',
+    addPayment: 'Add Payment',
+    paymentAmount: 'Payment Amount',
+    remainingBalance: 'Remaining Balance',
+    
+    // Notes
+    notes: 'Notes',
+    addNote: 'Add Note',
+    editNote: 'Edit Note',
+    deleteNote: 'Delete Note',
+    noteContent: 'Note Content',
+    
+    // Calculator
+    calculator: 'Calculator',
+    area: 'Area',
+    length: 'Length',
+    width: 'Width',
+    pricePerUnit: 'Price per Unit',
+    totalArea: 'Total Area',
+    totalCost: 'Total Cost',
+    calculate: 'Calculate',
+    
+    // Actions
+    save: 'Save',
+    cancel: 'Cancel',
+    delete: 'Delete',
+    edit: 'Edit',
+    close: 'Close',
+    search: 'Search',
+    filter: 'Filter',
+    export: 'Export',
+    import: 'Import',
+    
+    // Messages
+    success: 'Success',
+    error: 'Error',
+    loading: 'Loading',
+    noData: 'No data available',
+    confirmDelete: 'Are you sure you want to delete this item?',
+    deleteSuccess: 'Item deleted successfully',
+    saveSuccess: 'Changes saved successfully',
+    saveFailed: 'Failed to save changes',
+  },
+  fr: {
+    dashboard: 'Tableau de bord',
+    products: 'Produits',
+    sales: 'Ventes',
+    customerDebts: 'Dettes clients',
+    supplierDebts: 'Dettes fournisseurs',
+    settings: 'Paramètres',
+    language: 'Langue',
+    currency: 'Devise',
+    
+    // Dashboard
+    totalRevenue: 'Revenu total',
+    totalProfit: 'Profit total',
+    productsInStock: 'Produits en stock',
+    stockValue: 'Valeur du stock',
+    salesTrend: 'Tendance des ventes',
+    
+    // Products
+    productName: 'Nom du produit',
+    price: 'Prix',
+    quantity: 'Quantité',
+    unit: 'Unité',
+    image: 'Image',
+    measurement: 'Unité de mesure',
+    addProduct: 'Ajouter un produit',
+    editProduct: 'Modifier le produit',
+    deleteProduct: 'Supprimer le produit',
+    uploadImage: 'Télécharger une image',
+    noImage: 'Pas d\'image',
+    meter: 'Mètre (m)',
+    piece: 'Pièce',
+    manageProducts: 'Gérer votre inventaire',
+    purchase: 'Achat',
+    selling: 'Vente',
+    
+    // Sales
+    saleDate: 'Date de vente',
+    customer: 'Client',
+    product: 'Produit',
+    quantity: 'Quantité',
+    unitPrice: 'Prix unitaire',
+    totalPrice: 'Prix total',
+    profit: 'Profit',
+    addSale: 'Ajouter une vente',
+    editSale: 'Modifier la vente',
+    deleteSale: 'Supprimer la vente',
+    
+    // Debts
+    name: 'Nom',
+    amount: 'Montant',
+    status: 'Statut',
+    paid: 'Payé',
+    unpaid: 'Non payé',
+    partiallyPaid: 'Partiellement payé',
+    addDebt: 'Ajouter une dette',
+    addPayment: 'Ajouter un paiement',
+    paymentAmount: 'Montant du paiement',
+    remainingBalance: 'Solde restant',
+    
+    // Notes
+    notes: 'Notes',
+    addNote: 'Ajouter une note',
+    editNote: 'Modifier la note',
+    deleteNote: 'Supprimer la note',
+    noteContent: 'Contenu de la note',
+    
+    // Calculator
+    calculator: 'Calculatrice',
+    area: 'Surface',
+    length: 'Longueur',
+    width: 'Largeur',
+    pricePerUnit: 'Prix par unité',
+    totalArea: 'Surface totale',
+    totalCost: 'Coût total',
+    calculate: 'Calculer',
+    
+    // Actions
+    save: 'Enregistrer',
+    cancel: 'Annuler',
+    delete: 'Supprimer',
+    edit: 'Modifier',
+    close: 'Fermer',
+    search: 'Rechercher',
+    filter: 'Filtrer',
+    export: 'Exporter',
+    import: 'Importer',
+    
+    // Messages
+    success: 'Succès',
+    error: 'Erreur',
+    loading: 'Chargement',
+    noData: 'Aucune donnée disponible',
+    confirmDelete: 'Êtes-vous sûr de vouloir supprimer cet élément ?',
+    deleteSuccess: 'Élément supprimé avec succès',
+    saveSuccess: 'Modifications enregistrées avec succès',
+    saveFailed: 'Échec de l\'enregistrement des modifications',
+  },
+  ar: {
+    dashboard: 'لوحة التحكم',
+    products: 'المنتجات',
+    sales: 'المبيعات',
+    customerDebts: 'ديون العملاء',
+    supplierDebts: 'ديون الموردين',
+    settings: 'الإعدادات',
+    language: 'اللغة',
+    currency: 'العملة',
+    
+    // Dashboard
+    totalRevenue: 'إجمالي الإيرادات',
+    totalProfit: 'إجمالي الربح',
+    productsInStock: 'المنتجات المتاحة',
+    stockValue: 'قيمة المخزون',
+    salesTrend: 'اتجاه المبيعات',
+    
+    // Products
+    productName: 'اسم المنتج',
+    price: 'السعر',
+    quantity: 'الكمية',
+    unit: 'الوحدة',
+    image: 'صورة',
+    measurement: 'وحدة القياس',
+    addProduct: 'إضافة منتج',
+    editProduct: 'تعديل المنتج',
+    deleteProduct: 'حذف المنتج',
+    uploadImage: 'تحميل صورة',
+    noImage: 'لا توجد صورة',
+    meter: 'متر (م)',
+    piece: 'قطعة',
+    manageProducts: 'إدارة المخزون',
+    purchase: 'الشراء',
+    selling: 'البيع',
+    
+    // Sales
+    saleDate: 'تاريخ البيع',
+    customer: 'العميل',
+    product: 'المنتج',
+    quantity: 'الكمية',
+    unitPrice: 'السعر للوحدة',
+    totalPrice: 'السعر الإجمالي',
+    profit: 'الربح',
+    addSale: 'إضافة بيع',
+    editSale: 'تعديل البيع',
+    deleteSale: 'حذف البيع',
+    
+    // Debts
+    name: 'الاسم',
+    amount: 'المبلغ',
+    status: 'الحالة',
+    paid: 'مدفوع',
+    unpaid: 'غير مدفوع',
+    partiallyPaid: 'مدفوع جزئياً',
+    addDebt: 'إضافة دين',
+    addPayment: 'إضافة دفعة',
+    paymentAmount: 'مبلغ الدفعة',
+    remainingBalance: 'الرصيد المتبقي',
+    
+    // Notes
+    notes: 'ملاحظات',
+    addNote: 'إضافة ملاحظة',
+    editNote: 'تعديل الملاحظة',
+    deleteNote: 'حذف الملاحظة',
+    noteContent: 'محتوى الملاحظة',
+    
+    // Calculator
+    calculator: 'الآلة الحاسبة',
+    area: 'المساحة',
+    length: 'الطول',
+    width: 'العرض',
+    pricePerUnit: 'السعر لكل وحدة',
+    totalArea: 'إجمالي المساحة',
+    totalCost: 'التكلفة الإجمالية',
+    calculate: 'حساب',
+    
+    // Actions
+    save: 'حفظ',
+    cancel: 'إلغاء',
+    delete: 'حذف',
+    edit: 'تعديل',
+    close: 'إغلاق',
+    search: 'بحث',
+    filter: 'تصفية',
+    export: 'تصدير',
+    import: 'استيراد',
+    
+    // Messages
+    success: 'نجاح',
+    error: 'خطأ',
+    loading: 'جاري التحميل',
+    noData: 'لا توجد بيانات متاحة',
+    confirmDelete: 'هل أنت متأكد من رغبتك في حذف هذا العنصر؟',
+    deleteSuccess: 'تم حذف العنصر بنجاح',
+    saveSuccess: 'تم حفظ التغييرات بنجاح',
+    saveFailed: 'فشل حفظ التغييرات',
+  },
+};
+
+export function getTranslation(language: Language, key: string): string {
+  return translations[language]?.[key] || key;
+}
