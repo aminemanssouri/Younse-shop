@@ -14,7 +14,7 @@ interface CalculatorProps {
 }
 
 export function Calculator({ isOpen, onClose }: CalculatorProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [length, setLength] = useState('');
   const [width, setWidth] = useState('');
   const [pricePerUnit, setPricePerUnit] = useState('');
@@ -93,7 +93,7 @@ export function Calculator({ isOpen, onClose }: CalculatorProps) {
                 </div>
                 <div className="flex justify-between">
                   <span>{t('totalCost')}:</span>
-                  <span className="font-semibold">{displayPrice(result.cost)}</span>
+                  <span className="font-semibold">{displayPrice(result.cost, language)}</span>
                 </div>
               </div>
             </Card>

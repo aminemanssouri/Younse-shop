@@ -2,11 +2,13 @@
 
 import { Product } from '@/lib/types';
 import { Button } from '@/components/ui/button';
-import { Trash2, Pencil } from 'lucide-react';
+import { Trash2, Pencil, Eye } from 'lucide-react';
 import Image from 'next/image';
 import * as actions from '@/app/actions';
 import { useLanguage } from '@/contexts/language-context';
 import { displayPrice } from '@/lib/currency';
+import { DetailsDialog } from '@/components/details-dialog';
+import { useState } from 'react';
 
 interface ProductsTableProps {
   products: Product[];
@@ -15,7 +17,9 @@ interface ProductsTableProps {
 }
 
 export default function ProductsTable({ products, onEdit, onRefresh }: ProductsTableProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const [isViewOpen, setIsViewOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const handleDelete = async (id: number) => {
     if (!confirm(t('confirmDelete'))) return;
@@ -32,6 +36,11 @@ export default function ProductsTable({ products, onEdit, onRefresh }: ProductsT
   const getMeasurementLabel = (unit?: string) => {
     if (unit === 'm') return t('meter');
     return t('piece');
+  };
+
+  const handleView = (product: Product) => {
+    setSelectedProduct(product);
+    setIsViewOpen(true);
   };
 
   return (
@@ -100,10 +109,19 @@ export default function ProductsTable({ products, onEdit, onRefresh }: ProductsT
                   </span>
                 </td>
                 <td className="px-4 py-3 text-right text-sm font-semibold">
-                  {displayPrice(product.selling_price)}
+                  {displayPrice(product.selling_price, language)}
                 </td>
                 <td className="px-4 py-3 text-center">
                   <div className="flex gap-2 justify-center">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleView(product)}
+                      className="text-muted-foreground hover:text-foreground"
+                      title={t('view')}
+                    >
+                      <Eye className="w-4 h-4" />
+                    </Button>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -127,6 +145,50 @@ export default function ProductsTable({ products, onEdit, onRefresh }: ProductsT
           )}
         </tbody>
       </table>
+
+      <DetailsDialog
+        isOpen={isViewOpen}
+        onClose={() => setIsViewOpen(false)}
+        title={t('details')}
+      >
+        {selectedProduct && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <p className="text-muted-foreground">{t('productName')}</p>
+                <p className="font-medium">{selectedProduct.name}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">SKU</p>
+                <p className="font-medium">{selectedProduct.sku}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">{t('quantity')}</p>
+                <p className="font-medium">{selectedProduct.stock_quantity}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">{t('measurement')}</p>
+                <p className="font-medium">{getMeasurementLabel(selectedProduct.measurement_unit)}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">{t('price')} ({t('purchase')})</p>
+                <p className="font-medium">{displayPrice(selectedProduct.cost_price, language)}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">{t('price')} ({t('selling')})</p>
+                <p className="font-medium">{displayPrice(selectedProduct.selling_price, language)}</p>
+              </div>
+            </div>
+
+            {selectedProduct.notes && (
+              <div className="text-sm">
+                <p className="text-muted-foreground">Notes</p>
+                <p className="whitespace-pre-wrap">{selectedProduct.notes}</p>
+              </div>
+            )}
+          </div>
+        )}
+      </DetailsDialog>
     </div>
   );
 }

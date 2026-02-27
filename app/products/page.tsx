@@ -1,14 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, Calculator } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useProducts } from '@/hooks/use-products';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Navigation from '@/components/navigation';
 import ProductsTable from '@/components/products-table';
 import ProductModal from '@/components/product-modal';
-import { SimpleCalculator } from '@/components/simple-calculator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useLanguage } from '@/contexts/language-context';
 
@@ -16,7 +15,6 @@ export default function ProductsPage() {
   const { t } = useLanguage();
   const { products, loading, refetch } = useProducts();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   const handleEdit = (product: any) => {
@@ -51,14 +49,6 @@ export default function ProductsPage() {
             <p className="mt-2 text-lg text-muted-foreground">{t('products')} management</p>
           </div>
           <div className="flex gap-2">
-            <Button 
-              onClick={() => setIsCalculatorOpen(true)} 
-              variant="outline"
-              className="gap-2"
-            >
-              <Calculator className="h-4 w-4" />
-              {t('calculator')}
-            </Button>
             <Button onClick={handleNew} className="gap-2">
               <Plus className="h-4 w-4" />
               {t('addProduct')}
@@ -91,11 +81,6 @@ export default function ProductsPage() {
         product={selectedProduct}
         onClose={handleClose}
         onSuccess={handleSuccess}
-      />
-
-      <SimpleCalculator
-        isOpen={isCalculatorOpen}
-        onClose={() => setIsCalculatorOpen(false)}
       />
     </div>
   );

@@ -2,6 +2,7 @@
 
 import { LucideIcon } from 'lucide-react';
 import { displayPrice } from '@/lib/currency';
+import { useLanguage } from '@/contexts/language-context';
 
 interface KPICardProps {
   title: string;
@@ -15,9 +16,10 @@ interface KPICardProps {
 }
 
 export function KPICard({ title, value, icon: Icon, format = 'default', trend }: KPICardProps) {
+  const { language } = useLanguage();
   const formattedValue = 
     format === 'currency'
-      ? displayPrice(typeof value === 'number' ? value : parseFloat(value))
+      ? displayPrice(typeof value === 'number' ? value : parseFloat(value), language)
       : format === 'number' && typeof value === 'number'
       ? value.toLocaleString()
       : value;

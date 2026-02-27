@@ -2,8 +2,12 @@
 
 import { CustomerDebt, SupplierDebt } from '@/lib/types';
 import { Button } from '@/components/ui/button';
-import { Trash2, Pencil } from 'lucide-react';
+import { Trash2, Pencil, Eye } from 'lucide-react';
 import * as actions from '@/app/actions';
+import { DetailsDialog } from '@/components/details-dialog';
+import { useState } from 'react';
+import { useLanguage } from '@/contexts/language-context';
+import { displayPrice } from '@/lib/currency';
 
 type Debt = CustomerDebt | SupplierDebt;
 
@@ -15,6 +19,10 @@ interface DebtTableProps {
 }
 
 export default function DebtTable({ debts, type, onEdit, onRefresh }: DebtTableProps) {
+  const { t, language } = useLanguage();
+  const [isViewOpen, setIsViewOpen] = useState(false);
+  const [selectedDebt, setSelectedDebt] = useState<Debt | null>(null);
+
   const handleDelete = async (id: number) => {
     if (!confirm(`Are you sure you want to delete this ${type} debt?`)) return;
     
@@ -45,6 +53,11 @@ export default function DebtTable({ debts, type, onEdit, onRefresh }: DebtTableP
     } else {
       return (debt as SupplierDebt).contact_person || 'N/A';
     }
+  };
+
+  const handleView = (debt: Debt) => {
+    setSelectedDebt(debt);
+    setIsViewOpen(true);
   };
 
   return (
@@ -84,11 +97,19 @@ export default function DebtTable({ debts, type, onEdit, onRefresh }: DebtTableP
                       ? 'bg-orange-100 text-orange-800'
                       : 'bg-green-100 text-green-800'
                   }`}>
-                    ${debt.total_debt.toFixed(2)}
+                    {displayPrice(debt.total_debt, language)}
                   </span>
                 </td>
                 <td className="px-4 py-3 text-center">
                   <div className="flex gap-2 justify-center">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleView(debt)}
+                      title="View"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
                     <Button 
                       variant="outline" 
                       size="sm"
@@ -110,6 +131,39 @@ export default function DebtTable({ debts, type, onEdit, onRefresh }: DebtTableP
           )}
         </tbody>
       </table>
+
+      <DetailsDialog
+        isOpen={isViewOpen}
+        onClose={() => setIsViewOpen(false)}
+        title={t('details')}
+      >
+        {selectedDebt && (
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <p className="text-muted-foreground">Name</p>
+              <p className="font-medium">{getNameField(selectedDebt)}</p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">{type === 'customer' ? 'Email' : 'Contact Person'}</p>
+              <p className="font-medium">{getContactField(selectedDebt)}</p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">Phone</p>
+              <p className="font-medium">{selectedDebt.phone || 'N/A'}</p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">Total Debt</p>
+              <p className="font-medium">{displayPrice(selectedDebt.total_debt, language)}</p>
+            </div>
+            {(selectedDebt as any).notes && (
+              <div className="col-span-2">
+                <p className="text-muted-foreground">Notes</p>
+                <p className="whitespace-pre-wrap">{(selectedDebt as any).notes}</p>
+              </div>
+            )}
+          </div>
+        )}
+      </DetailsDialog>
     </div>
   );
 }
