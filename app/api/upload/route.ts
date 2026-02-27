@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs/promises';
-import path from 'path';
 import crypto from 'crypto';
+import { getSupabaseAdmin } from '@/lib/supabase-admin';
 
 export async function POST(request: NextRequest) {
   try {
@@ -24,20 +23,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create uploads directory if it doesn't exist
-    const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
-    await fs.mkdir(uploadsDir, { recursive: true });
+    const supabase = getSupabaseAdmin();
+    const bucket = process.env.SUPABASE_STORAGE_BUCKET || 'product-images';
 
-    // Generate unique filename
     const buffer = await file.arrayBuffer();
-    const filename = `${crypto.randomBytes(16).toString('hex')}-${Date.now()}${path.extname(file.name)}`;
-    const filepath = path.join(uploadsDir, filename);
+    const ext = file.name.includes('.') ? `.${file.name.split('.').pop()}` : '';
+    const filename = `${crypto.randomBytes(16).toString('hex')}-${Date.now()}${ext}`;
+    const objectPath = `products/${filename}`;
 
-    // Write file
-    await fs.writeFile(filepath, Buffer.from(buffer));
+    const { error: uploadError } = await supabase.storage
+      .from(bucket)
+      .upload(objectPath, Buffer.from(buffer), {
+        contentType: file.type,
+        upsert: false,
+      });
 
-    // Return the relative URL for the uploaded image
-    const imageUrl = `/uploads/${filename}`;
+    if (uploadError) {
+      console.error('Upload error:', uploadError);
+      return NextResponse.json(
+        { error: 'Upload failed' },
+        { status: 500 }
+      );
+    }
+
+    const { data } = supabase.storage.from(bucket).getPublicUrl(objectPath);
+    const imageUrl = data.publicUrl;
 
     return NextResponse.json({ url: imageUrl });
   } catch (error) {
