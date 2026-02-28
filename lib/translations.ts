@@ -96,6 +96,9 @@ export const translations: Record<Language, Record<string, string>> = {
     toDate: 'To date',
     minAmount: 'Min amount',
     maxAmount: 'Max amount',
+
+    cancelSale: 'Cancel sale',
+    confirmCancelSale: 'Cancel this sale? This will restore the product stock.',
     
     // Messages
     success: 'Success',
@@ -202,6 +205,9 @@ export const translations: Record<Language, Record<string, string>> = {
     toDate: 'Date fin',
     minAmount: 'Montant min',
     maxAmount: 'Montant max',
+
+    cancelSale: 'Annuler la vente',
+    confirmCancelSale: 'Annuler cette vente ? Cela restaurera le stock du produit.',
     
     // Messages
     success: 'Succès',
@@ -308,6 +314,9 @@ export const translations: Record<Language, Record<string, string>> = {
     toDate: 'إلى تاريخ',
     minAmount: 'أدنى مبلغ',
     maxAmount: 'أقصى مبلغ',
+
+    cancelSale: 'إلغاء البيع',
+    confirmCancelSale: 'هل تريد إلغاء هذا البيع؟ سيتم إرجاع المخزون للمنتج.',
     
     // Messages
     success: 'نجاح',

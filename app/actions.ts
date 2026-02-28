@@ -100,6 +100,26 @@ export async function deleteSale(id: number): Promise<void> {
   if (error) throw new Error(error.message);
 }
 
+export async function cancelSale(id: number): Promise<void> {
+  const sale = await getSale(id);
+  if (!sale) throw new Error('Sale not found');
+
+  const product = await getProduct(sale.product_id);
+  if (!product) throw new Error('Product not found');
+
+  const supabase = getSupabaseAdmin();
+
+  const newStock = (product.stock_quantity || 0) + (sale.quantity_sold || 0);
+  const { error: updateError } = await supabase
+    .from('products')
+    .update({ stock_quantity: newStock })
+    .eq('id', sale.product_id);
+  if (updateError) throw new Error(updateError.message);
+
+  const { error: deleteError } = await supabase.from('sales').delete().eq('id', id);
+  if (deleteError) throw new Error(deleteError.message);
+}
+
 // CUSTOMER DEBTS ACTIONS
 export async function getCustomerDebts(): Promise<CustomerDebt[]> {
   const supabase = getSupabaseAdmin();

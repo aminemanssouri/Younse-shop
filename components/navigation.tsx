@@ -53,7 +53,7 @@ export default function Navigation() {
           <div className="flex items-center gap-8">
             <Link href="/" className="flex items-center gap-2 font-bold text-xl text-foreground">
               <BarChart3 className="h-6 w-6" />
-              <span>Carpet Shop</span>
+              <span>Younes Shop</span>
             </Link>
             
             <div className="hidden md:flex gap-1">

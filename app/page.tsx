@@ -22,7 +22,7 @@ export default function DashboardPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold tracking-tight text-foreground">{t('dashboard')}</h1>
-          <p className="mt-2 text-lg text-muted-foreground">Manage your carpet shop efficiently</p>
+          <p className="mt-2 text-lg text-muted-foreground">Manage Younes Shop efficiently</p>
         </div>
 
         {/* KPI Cards Grid */}

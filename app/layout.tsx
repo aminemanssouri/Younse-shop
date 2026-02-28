@@ -8,8 +8,8 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Carpet Shop Manager',
-  description: 'Professional carpet shop management dashboard',
+  title: 'Younes Shop',
+  description: 'Shop management dashboard',
   generator: 'v0.app',
   icons: {
     icon: [

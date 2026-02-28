@@ -2,11 +2,12 @@
 
 import { Sale } from '@/lib/types';
 import { Button } from '@/components/ui/button';
-import { Eye } from 'lucide-react';
+import { Eye, X } from 'lucide-react';
 import { DetailsDialog } from '@/components/details-dialog';
 import { useState } from 'react';
 import { useLanguage } from '@/contexts/language-context';
 import { displayPrice } from '@/lib/currency';
+import * as actions from '@/app/actions';
 
 interface SalesTableProps {
   sales: Sale[];
@@ -17,6 +18,7 @@ export default function SalesTable({ sales, onRefresh }: SalesTableProps) {
   const { t, language } = useLanguage();
   const [isViewOpen, setIsViewOpen] = useState(false);
   const [selectedSale, setSelectedSale] = useState<Sale | null>(null);
+  const [cancelingId, setCancelingId] = useState<number | null>(null);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -33,6 +35,21 @@ export default function SalesTable({ sales, onRefresh }: SalesTableProps) {
     setIsViewOpen(true);
   };
 
+  const handleCancelSale = async (sale: Sale) => {
+    const ok = window.confirm(t('confirmCancelSale'));
+    if (!ok) return;
+
+    try {
+      setCancelingId(sale.id);
+      await actions.cancelSale(sale.id);
+      onRefresh();
+    } catch (e: any) {
+      alert(e?.message || t('error'));
+    } finally {
+      setCancelingId(null);
+    }
+  };
+
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
@@ -45,12 +62,13 @@ export default function SalesTable({ sales, onRefresh }: SalesTableProps) {
             <th className="px-4 py-3 text-right font-semibold text-foreground">Profit</th>
             <th className="px-4 py-3 text-left font-semibold text-foreground">Date</th>
             <th className="px-4 py-3 text-center font-semibold text-foreground">{t('view')}</th>
+            <th className="px-4 py-3 text-center font-semibold text-foreground">{t('cancelSale')}</th>
           </tr>
         </thead>
         <tbody>
           {sales.length === 0 ? (
             <tr>
-              <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
+              <td colSpan={8} className="px-4 py-8 text-center text-muted-foreground">
                 No sales records yet. Create one to get started.
               </td>
             </tr>
@@ -86,6 +104,17 @@ export default function SalesTable({ sales, onRefresh }: SalesTableProps) {
                     title={t('view')}
                   >
                     <Eye className="h-4 w-4" />
+                  </Button>
+                </td>
+                <td className="px-4 py-3 text-center">
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => handleCancelSale(sale)}
+                    disabled={cancelingId === sale.id}
+                    title={t('cancelSale')}
+                  >
+                    <X className="h-4 w-4" />
                   </Button>
                 </td>
               </tr>
