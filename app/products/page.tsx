@@ -5,6 +5,7 @@ import { Plus } from 'lucide-react';
 import { useProducts } from '@/hooks/use-products';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import Navigation from '@/components/navigation';
 import ProductsTable from '@/components/products-table';
 import ProductModal from '@/components/product-modal';
@@ -16,6 +17,24 @@ export default function ProductsPage() {
   const { products, loading, refetch } = useProducts();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [skuQuery, setSkuQuery] = useState('');
+  const [colorQuery, setColorQuery] = useState('');
+
+  const filteredProducts = products.filter((p) => {
+    const q = searchQuery.trim().toLowerCase();
+    const sku = skuQuery.trim().toLowerCase();
+    const color = colorQuery.trim().toLowerCase();
+
+    const matchesSearch = !q || p.name.toLowerCase().includes(q);
+    const matchesSku = !sku || p.sku.toLowerCase().includes(sku);
+    const matchesColor =
+      !color ||
+      (p.color || '').toLowerCase().includes(color) ||
+      (p.color || '').toLowerCase() === color;
+
+    return matchesSearch && matchesSku && matchesColor;
+  });
 
   const handleEdit = (product: any) => {
     setSelectedProduct(product);
@@ -63,11 +82,39 @@ export default function ProductsPage() {
             <CardDescription>{t('manageProducts')}</CardDescription>
           </CardHeader>
           <CardContent>
+            <div className="mb-4 grid grid-cols-1 gap-2 md:grid-cols-4">
+              <Input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={t('productName')}
+              />
+              <Input
+                value={skuQuery}
+                onChange={(e) => setSkuQuery(e.target.value)}
+                placeholder={t('sku')}
+              />
+              <Input
+                value={colorQuery}
+                onChange={(e) => setColorQuery(e.target.value)}
+                placeholder={t('color')}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setSearchQuery('');
+                  setSkuQuery('');
+                  setColorQuery('');
+                }}
+              >
+                {t('reset')}
+              </Button>
+            </div>
             {loading ? (
               <Skeleton className="h-64" />
             ) : (
               <ProductsTable 
-                products={products} 
+                products={filteredProducts} 
                 onEdit={handleEdit}
                 onRefresh={refetch}
               />

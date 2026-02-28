@@ -5,14 +5,38 @@ import { Plus } from 'lucide-react';
 import { useSales } from '@/hooks/use-sales';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import Navigation from '@/components/navigation';
 import SalesTable from '@/components/sales-table';
 import SaleModal from '@/components/sale-modal';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useLanguage } from '@/contexts/language-context';
 
 export default function SalesPage() {
+  const { t } = useLanguage();
   const { sales, loading, refetch } = useSales();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [skuQuery, setSkuQuery] = useState('');
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
+
+  const filteredSales = sales.filter((s) => {
+    const q = searchQuery.trim().toLowerCase();
+    const sku = skuQuery.trim().toLowerCase();
+
+    const productName = ((s as any).product_name || '').toString().toLowerCase();
+    const productSku = ((s as any).product_sku || '').toString().toLowerCase();
+
+    const matchesName = !q || productName.includes(q);
+    const matchesSku = !sku || productSku.includes(sku);
+
+    const d = new Date(s.sale_date);
+    const fromOk = !fromDate || d >= new Date(`${fromDate}T00:00:00`);
+    const toOk = !toDate || d <= new Date(`${toDate}T23:59:59`);
+
+    return matchesName && matchesSku && fromOk && toOk;
+  });
 
   const handleNew = () => {
     setIsModalOpen(true);
@@ -51,6 +75,42 @@ export default function SalesPage() {
             <CardDescription>View all sales transactions with revenue and profit details</CardDescription>
           </CardHeader>
           <CardContent>
+            <div className="mb-4 grid grid-cols-1 gap-2 md:grid-cols-5">
+              <Input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={t('productName')}
+              />
+              <Input
+                value={skuQuery}
+                onChange={(e) => setSkuQuery(e.target.value)}
+                placeholder={t('sku')}
+              />
+              <Input
+                type="date"
+                value={fromDate}
+                onChange={(e) => setFromDate(e.target.value)}
+                placeholder={t('fromDate')}
+              />
+              <Input
+                type="date"
+                value={toDate}
+                onChange={(e) => setToDate(e.target.value)}
+                placeholder={t('toDate')}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setSearchQuery('');
+                  setSkuQuery('');
+                  setFromDate('');
+                  setToDate('');
+                }}
+              >
+                {t('reset')}
+              </Button>
+            </div>
             {loading ? (
               <div className="space-y-2">
                 <Skeleton className="h-10" />
@@ -58,7 +118,7 @@ export default function SalesPage() {
                 <Skeleton className="h-10" />
               </div>
             ) : (
-              <SalesTable sales={sales} onRefresh={refetch} />
+              <SalesTable sales={filteredSales} onRefresh={refetch} />
             )}
           </CardContent>
         </Card>

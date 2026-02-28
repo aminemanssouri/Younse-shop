@@ -86,8 +86,16 @@ export const translations: Record<Language, Record<string, string>> = {
     close: 'Close',
     search: 'Search',
     filter: 'Filter',
+    reset: 'Reset',
     export: 'Export',
     import: 'Import',
+
+    sku: 'SKU',
+    color: 'Color',
+    fromDate: 'From date',
+    toDate: 'To date',
+    minAmount: 'Min amount',
+    maxAmount: 'Max amount',
     
     // Messages
     success: 'Success',
@@ -184,8 +192,16 @@ export const translations: Record<Language, Record<string, string>> = {
     close: 'Fermer',
     search: 'Rechercher',
     filter: 'Filtrer',
+    reset: 'Réinitialiser',
     export: 'Exporter',
     import: 'Importer',
+
+    sku: 'SKU',
+    color: 'Couleur',
+    fromDate: 'Date début',
+    toDate: 'Date fin',
+    minAmount: 'Montant min',
+    maxAmount: 'Montant max',
     
     // Messages
     success: 'Succès',
@@ -282,8 +298,16 @@ export const translations: Record<Language, Record<string, string>> = {
     close: 'إغلاق',
     search: 'بحث',
     filter: 'تصفية',
+    reset: 'إعادة ضبط',
     export: 'تصدير',
     import: 'استيراد',
+
+    sku: 'SKU',
+    color: 'اللون',
+    fromDate: 'من تاريخ',
+    toDate: 'إلى تاريخ',
+    minAmount: 'أدنى مبلغ',
+    maxAmount: 'أقصى مبلغ',
     
     // Messages
     success: 'نجاح',
