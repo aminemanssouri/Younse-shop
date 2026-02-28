@@ -89,6 +89,9 @@ export const translations: Record<Language, Record<string, string>> = {
     actions: 'Actions',
     notAvailable: 'N/A',
     menu: 'Menu',
+    theme: 'Theme',
+    darkMode: 'Dark mode',
+    lightMode: 'Light mode',
 
     saveDebt: 'Save Debt',
     saving: 'Saving...',
@@ -271,6 +274,9 @@ export const translations: Record<Language, Record<string, string>> = {
     actions: 'Actions',
     notAvailable: 'N/A',
     menu: 'Menu',
+    theme: 'Thème',
+    darkMode: 'Mode sombre',
+    lightMode: 'Mode clair',
 
     saveDebt: 'Enregistrer la dette',
     saving: 'Enregistrement...',
@@ -447,6 +453,9 @@ export const translations: Record<Language, Record<string, string>> = {
     actions: 'الإجراءات',
     notAvailable: 'غير متوفر',
     menu: 'القائمة',
+    theme: 'المظهر',
+    darkMode: 'الوضع الداكن',
+    lightMode: 'الوضع الفاتح',
 
     saveDebt: 'حفظ الدين',
     saving: 'جارٍ الحفظ...',
