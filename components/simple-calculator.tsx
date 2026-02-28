@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useLanguage } from '@/contexts/language-context';
 
 interface SimpleCalculatorProps {
   isOpen: boolean;
@@ -11,6 +12,7 @@ interface SimpleCalculatorProps {
 }
 
 export function SimpleCalculator({ isOpen, onClose }: SimpleCalculatorProps) {
+  const { t } = useLanguage();
   const [display, setDisplay] = useState('0');
   const [previousValue, setPreviousValue] = useState<number | null>(null);
   const [operation, setOperation] = useState<string | null>(null);
@@ -95,7 +97,7 @@ export function SimpleCalculator({ isOpen, onClose }: SimpleCalculatorProps) {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-xs">
         <DialogHeader>
-          <DialogTitle>Calculator</DialogTitle>
+          <DialogTitle>{t('calculator')}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <Input

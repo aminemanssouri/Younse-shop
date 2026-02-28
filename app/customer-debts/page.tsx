@@ -69,20 +69,20 @@ export default function CustomerDebtsPage() {
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-bold tracking-tight text-foreground">Customer Debts</h1>
-            <p className="mt-2 text-lg text-muted-foreground">Track customer credit accounts</p>
+            <h1 className="text-4xl font-bold tracking-tight text-foreground">{t('customerDebts')}</h1>
+            <p className="mt-2 text-lg text-muted-foreground">{t('customerDebtsSubtitle')}</p>
           </div>
           <Button onClick={handleNew} className="gap-2">
             <Plus className="h-4 w-4" />
-            New Customer Debt
+            {t('newCustomerDebt')}
           </Button>
         </div>
 
         {/* Debts Table */}
         <Card>
           <CardHeader>
-            <CardTitle>Customer Credit Accounts</CardTitle>
-            <CardDescription>View and manage customer debts</CardDescription>
+            <CardTitle>{t('customerCreditAccounts')}</CardTitle>
+            <CardDescription>{t('customerCreditAccountsDescription')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="mb-4 grid grid-cols-1 gap-2 md:grid-cols-6">
@@ -94,12 +94,12 @@ export default function CustomerDebtsPage() {
               <Input
                 value={contactQuery}
                 onChange={(e) => setContactQuery(e.target.value)}
-                placeholder="Email"
+                placeholder={t('email')}
               />
               <Input
                 value={phoneQuery}
                 onChange={(e) => setPhoneQuery(e.target.value)}
-                placeholder="Phone"
+                placeholder={t('phone')}
               />
               <Input
                 type="number"

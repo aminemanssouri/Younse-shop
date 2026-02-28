@@ -10,6 +10,8 @@ export const translations: Record<Language, Record<string, string>> = {
     settings: 'Settings',
     language: 'Language',
     currency: 'Currency',
+
+    dashboardSubtitle: 'Manage Younes Shop efficiently',
     
     // Dashboard
     totalRevenue: 'Total Revenue',
@@ -33,8 +35,15 @@ export const translations: Record<Language, Record<string, string>> = {
     meter: 'Meter (m)',
     piece: 'Piece',
     manageProducts: 'Manage your product inventory',
+    productsSubtitle: 'Manage your products',
     purchase: 'Purchase',
     selling: 'Selling',
+
+    productNotesPlaceholder: 'Add notes about this product...',
+
+    imagePreview: 'Image preview',
+    imageTypes: 'PNG, JPG, or WebP',
+    uploadFailed: 'Upload failed',
     
     // Sales
     saleDate: 'Sale Date',
@@ -45,10 +54,72 @@ export const translations: Record<Language, Record<string, string>> = {
     profit: 'Profit',
     addSale: 'Add Sale',
     editSale: 'Edit Sale',
+    newSale: 'New Sale',
+    recordNewSale: 'Record New Sale',
+    recordNewSaleDescription: 'Create a new sales record and update inventory',
+    recordSale: 'Record Sale',
+    recording: 'Recording...',
+    selectProduct: 'Select a product',
+    pleaseSelectProduct: 'Please select a product',
+    quantityMustBeGreaterThanZero: 'Quantity must be greater than 0',
+    failedToCreateSale: 'Failed to create sale',
+    quantitySold: 'Quantity Sold',
+    sellingPrice: 'Selling Price',
+    stock: 'Stock',
+    costPrice: 'Cost Price',
+    availableStock: 'Available Stock',
+    totalAmount: 'Total Amount',
+    expectedProfit: 'Expected Profit',
+    saleNotesPlaceholder: 'Add notes about this sale...',
+    salesSubtitle: 'Track your sales transactions',
+    salesRecords: 'Sales Records',
+    salesRecordsDescription: 'View all sales transactions with revenue and profit details',
+    noSalesRecords: 'No sales records yet. Create one to get started.',
+
+    salesTrendsTitle: 'Sales Trends',
+    salesTrendsDescription: 'Revenue and profit over time',
+
+    name: 'Name',
+    email: 'Email',
+    phone: 'Phone',
+    contactPerson: 'Contact Person',
+    customerName: 'Customer Name',
+    supplierName: 'Supplier Name',
+    totalDebt: 'Total Debt',
+    actions: 'Actions',
+    notAvailable: 'N/A',
+    menu: 'Menu',
+
+    saveDebt: 'Save Debt',
+    saving: 'Saving...',
+    deleteFailed: 'Failed to delete',
+    confirmDeleteCustomerDebt: 'Are you sure you want to delete this customer debt?',
+    confirmDeleteSupplierDebt: 'Are you sure you want to delete this supplier debt?',
+
+    editCustomerDebt: 'Edit Customer Debt',
+    editSupplierDebt: 'Edit Supplier Debt',
+    updateDebtDetails: 'Update debt details',
+    createDebtAccount: 'Create a new debt account',
+
+    customerNamePlaceholder: "e.g., Ali's Furniture Store",
+    supplierNamePlaceholder: 'e.g., Persian Imports Inc',
+    contactPersonPlaceholder: 'e.g., Ahmed Khan',
+    emailPlaceholder: 'customer@example.com',
+    phonePlaceholder: '+1 (555) 123-4567',
+    debtNotesPlaceholder: 'Add notes about this debt...',
+
+    customerDebtsSubtitle: 'Track customer credit accounts',
+    newCustomerDebt: 'New Customer Debt',
+    customerCreditAccounts: 'Customer Credit Accounts',
+    customerCreditAccountsDescription: 'View and manage customer debts',
+
+    supplierDebtsSubtitle: 'Track payments owed to suppliers',
+    newSupplierDebt: 'New Supplier Debt',
+    supplierPaymentAccounts: 'Supplier Payment Accounts',
+    supplierPaymentAccountsDescription: 'View and manage supplier debts',
     deleteSale: 'Delete Sale',
     
     // Debts
-    name: 'Name',
     amount: 'Amount',
     status: 'Status',
     paid: 'Paid',
@@ -68,6 +139,8 @@ export const translations: Record<Language, Record<string, string>> = {
     
     // Calculator
     calculator: 'Calculator',
+    areaCalculator: 'Area',
+    basicCalculator: 'Basic',
     area: 'Area',
     length: 'Length',
     width: 'Width',
@@ -119,6 +192,8 @@ export const translations: Record<Language, Record<string, string>> = {
     settings: 'Paramètres',
     language: 'Langue',
     currency: 'Devise',
+
+    dashboardSubtitle: 'Gérez Younes Shop efficacement',
     
     // Dashboard
     totalRevenue: 'Revenu total',
@@ -142,8 +217,15 @@ export const translations: Record<Language, Record<string, string>> = {
     meter: 'Mètre (m)',
     piece: 'Pièce',
     manageProducts: 'Gérer votre inventaire',
+    productsSubtitle: 'Gérez vos produits',
     purchase: 'Achat',
     selling: 'Vente',
+
+    productNotesPlaceholder: 'Ajouter des notes sur ce produit...',
+
+    imagePreview: 'Aperçu de l\'image',
+    imageTypes: 'PNG, JPG, ou WebP',
+    uploadFailed: 'Échec du téléchargement',
     
     // Sales
     saleDate: 'Date de vente',
@@ -154,10 +236,72 @@ export const translations: Record<Language, Record<string, string>> = {
     profit: 'Profit',
     addSale: 'Ajouter une vente',
     editSale: 'Modifier la vente',
+    newSale: 'Nouvelle vente',
+    recordNewSale: 'Enregistrer une vente',
+    recordNewSaleDescription: 'Créer une vente et mettre à jour le stock',
+    recordSale: 'Enregistrer',
+    recording: 'Enregistrement...',
+    selectProduct: 'Sélectionner un produit',
+    pleaseSelectProduct: 'Veuillez sélectionner un produit',
+    quantityMustBeGreaterThanZero: 'La quantité doit être supérieure à 0',
+    failedToCreateSale: 'Échec de la création de la vente',
+    quantitySold: 'Quantité vendue',
+    sellingPrice: 'Prix de vente',
+    stock: 'Stock',
+    costPrice: 'Prix d\'achat',
+    availableStock: 'Stock disponible',
+    totalAmount: 'Montant total',
+    expectedProfit: 'Bénéfice attendu',
+    saleNotesPlaceholder: 'Ajouter des notes sur cette vente...',
+    salesSubtitle: 'Suivez vos transactions de vente',
+    salesRecords: 'Historique des ventes',
+    salesRecordsDescription: 'Voir toutes les ventes avec les détails des revenus et bénéfices',
+    noSalesRecords: 'Aucune vente pour le moment. Créez-en une pour commencer.',
+
+    salesTrendsTitle: 'Tendances des ventes',
+    salesTrendsDescription: 'Revenus et bénéfices au fil du temps',
+
+    name: 'Nom',
+    email: 'E-mail',
+    phone: 'Téléphone',
+    contactPerson: 'Personne de contact',
+    customerName: 'Nom du client',
+    supplierName: 'Nom du fournisseur',
+    totalDebt: 'Dette totale',
+    actions: 'Actions',
+    notAvailable: 'N/A',
+    menu: 'Menu',
+
+    saveDebt: 'Enregistrer la dette',
+    saving: 'Enregistrement...',
+    deleteFailed: 'Échec de la suppression',
+    confirmDeleteCustomerDebt: 'Êtes-vous sûr de vouloir supprimer cette dette client ?',
+    confirmDeleteSupplierDebt: 'Êtes-vous sûr de vouloir supprimer cette dette fournisseur ?',
+
+    editCustomerDebt: 'Modifier la dette client',
+    editSupplierDebt: 'Modifier la dette fournisseur',
+    updateDebtDetails: 'Mettre à jour les détails de la dette',
+    createDebtAccount: 'Créer un nouveau compte de dette',
+
+    customerNamePlaceholder: "ex. Magasin d\'Ali",
+    supplierNamePlaceholder: 'ex. Persian Imports Inc',
+    contactPersonPlaceholder: 'ex. Ahmed Khan',
+    emailPlaceholder: 'client@example.com',
+    phonePlaceholder: '+212 6 00 00 00 00',
+    debtNotesPlaceholder: 'Ajouter des notes sur cette dette...',
+
+    customerDebtsSubtitle: 'Suivez les comptes clients à crédit',
+    newCustomerDebt: 'Nouveau crédit client',
+    customerCreditAccounts: 'Comptes clients à crédit',
+    customerCreditAccountsDescription: 'Voir et gérer les dettes des clients',
+
+    supplierDebtsSubtitle: 'Suivez les paiements dus aux fournisseurs',
+    newSupplierDebt: 'Nouvelle dette fournisseur',
+    supplierPaymentAccounts: 'Comptes fournisseurs',
+    supplierPaymentAccountsDescription: 'Voir et gérer les dettes des fournisseurs',
     deleteSale: 'Supprimer la vente',
     
     // Debts
-    name: 'Nom',
     amount: 'Montant',
     status: 'Statut',
     paid: 'Payé',
@@ -177,6 +321,8 @@ export const translations: Record<Language, Record<string, string>> = {
     
     // Calculator
     calculator: 'Calculatrice',
+    areaCalculator: 'Surface',
+    basicCalculator: 'Basique',
     area: 'Surface',
     length: 'Longueur',
     width: 'Largeur',
@@ -228,6 +374,8 @@ export const translations: Record<Language, Record<string, string>> = {
     settings: 'الإعدادات',
     language: 'اللغة',
     currency: 'العملة',
+
+    dashboardSubtitle: 'إدارة Younes Shop بكفاءة',
     
     // Dashboard
     totalRevenue: 'إجمالي الإيرادات',
@@ -251,6 +399,7 @@ export const translations: Record<Language, Record<string, string>> = {
     meter: 'متر (م)',
     piece: 'قطعة',
     manageProducts: 'إدارة المخزون',
+    productsSubtitle: 'إدارة المنتجات',
     purchase: 'الشراء',
     selling: 'البيع',
     
@@ -262,11 +411,71 @@ export const translations: Record<Language, Record<string, string>> = {
     totalPrice: 'السعر الإجمالي',
     profit: 'الربح',
     addSale: 'إضافة بيع',
-    editSale: 'تعديل البيع',
-    deleteSale: 'حذف البيع',
-    
-    // Debts
+    editSale: 'تعديل بيع',
+    newSale: 'بيع جديد',
+    recordNewSale: 'تسجيل بيع جديد',
+    recordNewSaleDescription: 'إنشاء سجل بيع جديد وتحديث المخزون',
+    recordSale: 'تسجيل البيع',
+    recording: 'جارٍ التسجيل...',
+    selectProduct: 'اختر منتجاً',
+    pleaseSelectProduct: 'الرجاء اختيار منتج',
+    quantityMustBeGreaterThanZero: 'يجب أن تكون الكمية أكبر من 0',
+    failedToCreateSale: 'فشل إنشاء البيع',
+    quantitySold: 'الكمية المباعة',
+    sellingPrice: 'سعر البيع',
+    stock: 'المخزون',
+    costPrice: 'سعر الشراء',
+    availableStock: 'المخزون المتاح',
+    totalAmount: 'المبلغ الإجمالي',
+    expectedProfit: 'الربح المتوقع',
+    saleNotesPlaceholder: 'أضف ملاحظات حول هذا البيع...',
+    salesSubtitle: 'تتبع معاملات البيع',
+    salesRecords: 'سجل المبيعات',
+    salesRecordsDescription: 'عرض جميع معاملات البيع مع تفاصيل الإيرادات والربح',
+    noSalesRecords: 'لا توجد مبيعات بعد. قم بإنشاء واحدة للبدء.',
+
+    salesTrendsTitle: 'اتجاهات المبيعات',
+    salesTrendsDescription: 'الإيرادات والربح عبر الوقت',
+
     name: 'الاسم',
+    email: 'البريد الإلكتروني',
+    phone: 'الهاتف',
+    contactPerson: 'جهة الاتصال',
+    customerName: 'اسم العميل',
+    supplierName: 'اسم المورد',
+    totalDebt: 'إجمالي الدين',
+    actions: 'الإجراءات',
+    notAvailable: 'غير متوفر',
+    menu: 'القائمة',
+
+    saveDebt: 'حفظ الدين',
+    saving: 'جارٍ الحفظ...',
+    deleteFailed: 'فشل الحذف',
+    confirmDeleteCustomerDebt: 'هل أنت متأكد من حذف دين العميل؟',
+    confirmDeleteSupplierDebt: 'هل أنت متأكد من حذف دين المورد؟',
+
+    editCustomerDebt: 'تعديل دين العميل',
+    editSupplierDebt: 'تعديل دين المورد',
+    updateDebtDetails: 'تحديث تفاصيل الدين',
+    createDebtAccount: 'إنشاء حساب دين جديد',
+
+    customerNamePlaceholder: 'مثال: متجر علي',
+    supplierNamePlaceholder: 'مثال: شركة استيراد',
+    contactPersonPlaceholder: 'مثال: أحمد',
+    emailPlaceholder: 'customer@example.com',
+    phonePlaceholder: '+212 6 00 00 00 00',
+    productNotesPlaceholder: 'أضف ملاحظات حول هذا المنتج...',
+
+    imagePreview: 'معاينة الصورة',
+    imageTypes: 'PNG أو JPG أو WebP',
+    uploadFailed: 'فشل الرفع',
+
+    customerDebtsSubtitle: 'تتبع حسابات ديون العملاء',
+    newCustomerDebt: 'دين عميل جديد',
+    customerCreditAccounts: 'حسابات ديون العملاء',
+    customerCreditAccountsDescription: 'عرض وإدارة ديون العملاء',
+
+    // Debts
     amount: 'المبلغ',
     status: 'الحالة',
     paid: 'مدفوع',
@@ -286,6 +495,8 @@ export const translations: Record<Language, Record<string, string>> = {
     
     // Calculator
     calculator: 'الآلة الحاسبة',
+    areaCalculator: 'المساحة',
+    basicCalculator: 'عادية',
     area: 'المساحة',
     length: 'الطول',
     width: 'العرض',

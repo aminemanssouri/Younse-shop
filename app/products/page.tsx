@@ -65,7 +65,7 @@ export default function ProductsPage() {
         <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-4xl font-bold tracking-tight text-foreground">{t('products')}</h1>
-            <p className="mt-2 text-lg text-muted-foreground">{t('products')} management</p>
+            <p className="mt-2 text-lg text-muted-foreground">{t('productsSubtitle')}</p>
           </div>
           <div className="flex gap-2">
             <Button onClick={handleNew} className="gap-2">

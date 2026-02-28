@@ -21,7 +21,8 @@ export default function SalesTable({ sales, onRefresh }: SalesTableProps) {
   const [cancelingId, setCancelingId] = useState<number | null>(null);
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    const locale = language === 'ar' ? 'ar-MA' : language === 'fr' ? 'fr-FR' : 'en-US';
+    return new Date(dateString).toLocaleDateString(locale, {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
@@ -55,12 +56,12 @@ export default function SalesTable({ sales, onRefresh }: SalesTableProps) {
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-border">
-            <th className="px-4 py-3 text-left font-semibold text-foreground">Product</th>
-            <th className="px-4 py-3 text-right font-semibold text-foreground">Quantity</th>
-            <th className="px-4 py-3 text-right font-semibold text-foreground">Unit Price</th>
-            <th className="px-4 py-3 text-right font-semibold text-foreground">Total Amount</th>
-            <th className="px-4 py-3 text-right font-semibold text-foreground">Profit</th>
-            <th className="px-4 py-3 text-left font-semibold text-foreground">Date</th>
+            <th className="px-4 py-3 text-left font-semibold text-foreground">{t('product')}</th>
+            <th className="px-4 py-3 text-right font-semibold text-foreground">{t('quantity')}</th>
+            <th className="px-4 py-3 text-right font-semibold text-foreground">{t('unitPrice')}</th>
+            <th className="px-4 py-3 text-right font-semibold text-foreground">{t('totalPrice')}</th>
+            <th className="px-4 py-3 text-right font-semibold text-foreground">{t('profit')}</th>
+            <th className="px-4 py-3 text-left font-semibold text-foreground">{t('saleDate')}</th>
             <th className="px-4 py-3 text-center font-semibold text-foreground">{t('view')}</th>
             <th className="px-4 py-3 text-center font-semibold text-foreground">{t('cancelSale')}</th>
           </tr>
@@ -69,7 +70,7 @@ export default function SalesTable({ sales, onRefresh }: SalesTableProps) {
           {sales.length === 0 ? (
             <tr>
               <td colSpan={8} className="px-4 py-8 text-center text-muted-foreground">
-                No sales records yet. Create one to get started.
+                {t('noSalesRecords')}
               </td>
             </tr>
           ) : (
@@ -77,8 +78,8 @@ export default function SalesTable({ sales, onRefresh }: SalesTableProps) {
               <tr key={sale.id} className="border-b border-border hover:bg-muted/50">
                 <td className="px-4 py-3">
                   <div>
-                    <p className="font-medium text-foreground">{(sale as any).product_name || 'Product'}</p>
-                    <p className="text-xs text-muted-foreground">{(sale as any).product_sku || 'SKU'}</p>
+                    <p className="font-medium text-foreground">{(sale as any).product_name || t('product')}</p>
+                    <p className="text-xs text-muted-foreground">{(sale as any).product_sku || t('sku')}</p>
                   </div>
                 </td>
                 <td className="px-4 py-3 text-right text-foreground">{sale.quantity_sold}</td>
@@ -131,32 +132,32 @@ export default function SalesTable({ sales, onRefresh }: SalesTableProps) {
         {selectedSale && (
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <p className="text-muted-foreground">Product</p>
+              <p className="text-muted-foreground">{t('product')}</p>
               <p className="font-medium">{(selectedSale as any).product_name || selectedSale.product_id}</p>
             </div>
             <div>
-              <p className="text-muted-foreground">Quantity</p>
+              <p className="text-muted-foreground">{t('quantity')}</p>
               <p className="font-medium">{selectedSale.quantity_sold}</p>
             </div>
             <div>
-              <p className="text-muted-foreground">Unit Price</p>
+              <p className="text-muted-foreground">{t('unitPrice')}</p>
               <p className="font-medium">{displayPrice(selectedSale.selling_price, language)}</p>
             </div>
             <div>
-              <p className="text-muted-foreground">Total Amount</p>
+              <p className="text-muted-foreground">{t('totalAmount')}</p>
               <p className="font-medium">{displayPrice(selectedSale.total_amount, language)}</p>
             </div>
             <div>
-              <p className="text-muted-foreground">Profit</p>
+              <p className="text-muted-foreground">{t('profit')}</p>
               <p className="font-medium">{displayPrice(selectedSale.profit_amount, language)}</p>
             </div>
             <div>
-              <p className="text-muted-foreground">Date</p>
+              <p className="text-muted-foreground">{t('saleDate')}</p>
               <p className="font-medium">{formatDate(selectedSale.sale_date)}</p>
             </div>
             {selectedSale.notes && (
               <div className="col-span-2">
-                <p className="text-muted-foreground">Notes</p>
+                <p className="text-muted-foreground">{t('notes')}</p>
                 <p className="whitespace-pre-wrap">{selectedSale.notes}</p>
               </div>
             )}

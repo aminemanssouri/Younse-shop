@@ -3,15 +3,18 @@
 import { Sale } from '@/lib/types';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useLanguage } from '@/contexts/language-context';
+import { displayPrice } from '@/lib/currency';
 
 interface SalesChartProps {
   sales: Sale[];
 }
 
 export function SalesChart({ sales }: SalesChartProps) {
+  const { t, language } = useLanguage();
   // Group sales by date
   const chartData = (sales && sales.length > 0) ? sales.reduce((acc, sale) => {
-    const date = new Date(sale.sale_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const date = new Date(sale.sale_date).toLocaleDateString(language === 'ar' ? 'ar-MA' : language === 'fr' ? 'fr-FR' : 'en-US', { month: 'short', day: 'numeric' });
     const existing = acc.find(item => item.date === date);
     
     if (existing) {
@@ -31,8 +34,8 @@ export function SalesChart({ sales }: SalesChartProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Sales Trends</CardTitle>
-        <CardDescription>Revenue and profit over time</CardDescription>
+        <CardTitle>{t('salesTrendsTitle')}</CardTitle>
+        <CardDescription>{t('salesTrendsDescription')}</CardDescription>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
@@ -40,7 +43,7 @@ export function SalesChart({ sales }: SalesChartProps) {
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="date" />
             <YAxis />
-            <Tooltip formatter={(value) => `$${value.toFixed(2)}`} />
+            <Tooltip formatter={(value: any) => displayPrice(typeof value === 'number' ? value : parseFloat(value), language)} />
             <Legend />
             <Line type="monotone" dataKey="revenue" stroke="#3b82f6" strokeWidth={2} />
             <Line type="monotone" dataKey="profit" stroke="#10b981" strokeWidth={2} />

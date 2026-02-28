@@ -59,7 +59,7 @@ export function ImageInput({ value, onChange, label }: ImageInputProps) {
           <div className="relative w-full h-48 bg-muted rounded-lg overflow-hidden">
             <Image
               src={value}
-              alt="Product preview"
+              alt={t('imagePreview')}
               fill
               className="object-cover"
             />
@@ -81,11 +81,11 @@ export function ImageInput({ value, onChange, label }: ImageInputProps) {
         >
           <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
           <p className="text-sm font-medium">{t('uploadImage')}</p>
-          <p className="text-xs text-muted-foreground mt-1">PNG, JPG, or WebP</p>
+          <p className="text-xs text-muted-foreground mt-1">{t('imageTypes')}</p>
         </div>
       )}
 
-      {error && <p className="text-sm text-destructive">{error}</p>}
+      {error && <p className="text-sm text-destructive">{t('uploadFailed')}</p>}
 
       <input
         ref={fileInputRef}

@@ -50,18 +50,18 @@ export default function ProductsTable({ products, onEdit, onRefresh }: ProductsT
           <tr className="border-b border-border">
             <th className="px-4 py-3 text-left font-semibold text-foreground">{t('image')}</th>
             <th className="px-4 py-3 text-left font-semibold text-foreground">{t('productName')}</th>
-            <th className="px-4 py-3 text-left font-semibold text-foreground">SKU</th>
-            <th className="px-4 py-3 text-center font-semibold text-foreground">Color</th>
+            <th className="px-4 py-3 text-left font-semibold text-foreground">{t('sku')}</th>
+            <th className="px-4 py-3 text-center font-semibold text-foreground">{t('color')}</th>
             <th className="px-4 py-3 text-center font-semibold text-foreground">{t('measurement')}</th>
             <th className="px-4 py-3 text-right font-semibold text-foreground">{t('quantity')}</th>
             <th className="px-4 py-3 text-right font-semibold text-foreground">{t('price')}</th>
-            <th className="px-4 py-3 text-center font-semibold text-foreground">{t('close')}</th>
+            <th className="px-4 py-3 text-center font-semibold text-foreground">{t('actions')}</th>
           </tr>
         </thead>
         <tbody>
           {products.length === 0 ? (
             <tr>
-              <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
+              <td colSpan={8} className="px-4 py-8 text-center text-muted-foreground">
                 {t('noData')}
               </td>
             </tr>
@@ -159,7 +159,7 @@ export default function ProductsTable({ products, onEdit, onRefresh }: ProductsT
                 <p className="font-medium">{selectedProduct.name}</p>
               </div>
               <div>
-                <p className="text-muted-foreground">SKU</p>
+                <p className="text-muted-foreground">{t('sku')}</p>
                 <p className="font-medium">{selectedProduct.sku}</p>
               </div>
               <div>
@@ -169,6 +169,10 @@ export default function ProductsTable({ products, onEdit, onRefresh }: ProductsT
               <div>
                 <p className="text-muted-foreground">{t('measurement')}</p>
                 <p className="font-medium">{getMeasurementLabel(selectedProduct.measurement_unit)}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">{t('color')}</p>
+                <p className="font-medium">{selectedProduct.color || '-'}</p>
               </div>
               <div>
                 <p className="text-muted-foreground">{t('price')} ({t('purchase')})</p>
@@ -182,7 +186,7 @@ export default function ProductsTable({ products, onEdit, onRefresh }: ProductsT
 
             {selectedProduct.notes && (
               <div className="text-sm">
-                <p className="text-muted-foreground">Notes</p>
+                <p className="text-muted-foreground">{t('notes')}</p>
                 <p className="whitespace-pre-wrap">{selectedProduct.notes}</p>
               </div>
             )}

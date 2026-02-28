@@ -9,7 +9,7 @@ import { useLanguage } from '@/contexts/language-context';
 import * as actions from '@/app/actions';
 
 export function FloatingNotesButton() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [notes, setNotes] = useState<any[]>([]);
   const [newNote, setNewNote] = useState('');
@@ -89,7 +89,7 @@ export function FloatingNotesButton() {
             <div className="space-y-2">
               <h3 className="font-medium text-sm">{t('notes')}</h3>
               {isLoading ? (
-                <p className="text-sm text-muted-foreground">{t('loading')}...</p>
+                <p className="text-sm text-muted-foreground">{t('loading')}</p>
               ) : notes.length === 0 ? (
                 <p className="text-sm text-muted-foreground">{t('noData')}</p>
               ) : (
@@ -108,7 +108,9 @@ export function FloatingNotesButton() {
                         </Button>
                       </div>
                       <p className="text-xs text-muted-foreground mt-2">
-                        {new Date(note.created_at).toLocaleDateString()}
+                        {new Date(note.created_at).toLocaleDateString(
+                          language === 'ar' ? 'ar-MA' : language === 'fr' ? 'fr-FR' : 'en-US'
+                        )}
                       </p>
                     </div>
                   ))}

@@ -118,13 +118,13 @@ export default function ProductModal({ isOpen, product, onClose, onSuccess }: Pr
           </div>
 
           <div>
-            <Label htmlFor="sku">SKU</Label>
+            <Label htmlFor="sku">{t('sku')}</Label>
             <Input
               id="sku"
               name="sku"
               value={formData.sku}
               onChange={handleChange}
-              placeholder="SKU"
+              placeholder={t('sku')}
               required
             />
           </div>
@@ -184,7 +184,7 @@ export default function ProductModal({ isOpen, product, onClose, onSuccess }: Pr
           </div>
 
           <div>
-            <Label htmlFor="color">Color</Label>
+            <Label htmlFor="color">{t('color')}</Label>
             <div className="flex gap-2 items-center">
               <Input
                 id="color"
@@ -198,12 +198,12 @@ export default function ProductModal({ isOpen, product, onClose, onSuccess }: Pr
           </div>
 
           <div>
-            <Label htmlFor="notes">Notes</Label>
+            <Label htmlFor="notes">{t('notes')}</Label>
             <textarea
               id="notes"
               value={formData.notes}
               onChange={handleNotesChange}
-              placeholder="Add notes about this product..."
+              placeholder={t('productNotesPlaceholder')}
               className="w-full h-20 px-3 py-2 border border-input rounded-md bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>

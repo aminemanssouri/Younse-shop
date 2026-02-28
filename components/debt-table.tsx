@@ -24,7 +24,7 @@ export default function DebtTable({ debts, type, onEdit, onRefresh }: DebtTableP
   const [selectedDebt, setSelectedDebt] = useState<Debt | null>(null);
 
   const handleDelete = async (id: number) => {
-    if (!confirm(`Are you sure you want to delete this ${type} debt?`)) return;
+    if (!confirm(t(type === 'customer' ? 'confirmDeleteCustomerDebt' : 'confirmDeleteSupplierDebt'))) return;
     
     try {
       if (type === 'customer') {
@@ -35,7 +35,7 @@ export default function DebtTable({ debts, type, onEdit, onRefresh }: DebtTableP
       onRefresh();
     } catch (error) {
       console.error(`Error deleting ${type} debt:`, error);
-      alert(`Failed to delete ${type} debt`);
+      alert(t('deleteFailed'));
     }
   };
 
@@ -49,9 +49,9 @@ export default function DebtTable({ debts, type, onEdit, onRefresh }: DebtTableP
 
   const getContactField = (debt: Debt) => {
     if (type === 'customer') {
-      return (debt as CustomerDebt).email || 'N/A';
+      return (debt as CustomerDebt).email || t('notAvailable');
     } else {
-      return (debt as SupplierDebt).contact_person || 'N/A';
+      return (debt as SupplierDebt).contact_person || t('notAvailable');
     }
   };
 
@@ -66,21 +66,21 @@ export default function DebtTable({ debts, type, onEdit, onRefresh }: DebtTableP
         <thead>
           <tr className="border-b border-border">
             <th className="px-4 py-3 text-left font-semibold text-foreground">
-              {type === 'customer' ? 'Customer' : 'Supplier'} Name
+              {type === 'customer' ? t('customerName') : t('supplierName')}
             </th>
             <th className="px-4 py-3 text-left font-semibold text-foreground">
-              {type === 'customer' ? 'Email' : 'Contact Person'}
+              {type === 'customer' ? t('email') : t('contactPerson')}
             </th>
-            <th className="px-4 py-3 text-left font-semibold text-foreground">Phone</th>
-            <th className="px-4 py-3 text-right font-semibold text-foreground">Total Debt</th>
-            <th className="px-4 py-3 text-center font-semibold text-foreground">Actions</th>
+            <th className="px-4 py-3 text-left font-semibold text-foreground">{t('phone')}</th>
+            <th className="px-4 py-3 text-right font-semibold text-foreground">{t('totalDebt')}</th>
+            <th className="px-4 py-3 text-center font-semibold text-foreground">{t('actions')}</th>
           </tr>
         </thead>
         <tbody>
           {debts.length === 0 ? (
             <tr>
               <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
-                No {type} debts found. Create one to get started.
+                {t(type === 'customer' ? 'noCustomerDebts' : 'noSupplierDebts')}
               </td>
             </tr>
           ) : (
@@ -89,7 +89,7 @@ export default function DebtTable({ debts, type, onEdit, onRefresh }: DebtTableP
                 <td className="px-4 py-3 font-medium text-foreground">{getNameField(debt)}</td>
                 <td className="px-4 py-3 text-muted-foreground">{getContactField(debt)}</td>
                 <td className="px-4 py-3 text-muted-foreground">
-                  {debt.phone || 'N/A'}
+                  {debt.phone || t('notAvailable')}
                 </td>
                 <td className="px-4 py-3 text-right">
                   <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${
@@ -106,7 +106,7 @@ export default function DebtTable({ debts, type, onEdit, onRefresh }: DebtTableP
                       variant="outline"
                       size="sm"
                       onClick={() => handleView(debt)}
-                      title="View"
+                      title={t('view')}
                     >
                       <Eye className="h-4 w-4" />
                     </Button>
@@ -140,24 +140,24 @@ export default function DebtTable({ debts, type, onEdit, onRefresh }: DebtTableP
         {selectedDebt && (
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <p className="text-muted-foreground">Name</p>
+              <p className="text-muted-foreground">{t('name')}</p>
               <p className="font-medium">{getNameField(selectedDebt)}</p>
             </div>
             <div>
-              <p className="text-muted-foreground">{type === 'customer' ? 'Email' : 'Contact Person'}</p>
+              <p className="text-muted-foreground">{type === 'customer' ? t('email') : t('contactPerson')}</p>
               <p className="font-medium">{getContactField(selectedDebt)}</p>
             </div>
             <div>
-              <p className="text-muted-foreground">Phone</p>
-              <p className="font-medium">{selectedDebt.phone || 'N/A'}</p>
+              <p className="text-muted-foreground">{t('phone')}</p>
+              <p className="font-medium">{selectedDebt.phone || t('notAvailable')}</p>
             </div>
             <div>
-              <p className="text-muted-foreground">Total Debt</p>
+              <p className="text-muted-foreground">{t('totalDebt')}</p>
               <p className="font-medium">{displayPrice(selectedDebt.total_debt, language)}</p>
             </div>
             {(selectedDebt as any).notes && (
               <div className="col-span-2">
-                <p className="text-muted-foreground">Notes</p>
+                <p className="text-muted-foreground">{t('notes')}</p>
                 <p className="whitespace-pre-wrap">{(selectedDebt as any).notes}</p>
               </div>
             )}

@@ -8,6 +8,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useLanguage } from '@/contexts/language-context';
+import { displayPrice } from '@/lib/currency';
+import Image from 'next/image';
 
 interface SaleModalProps {
   isOpen: boolean;
@@ -16,6 +19,7 @@ interface SaleModalProps {
 }
 
 export default function SaleModal({ isOpen, onClose, onSuccess }: SaleModalProps) {
+  const { t, language } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -73,12 +77,12 @@ export default function SaleModal({ isOpen, onClose, onSuccess }: SaleModalProps
     e.preventDefault();
     
     if (!selectedProduct) {
-      alert('Please select a product');
+      alert(t('pleaseSelectProduct'));
       return;
     }
 
     if (formData.quantity_sold <= 0) {
-      alert('Quantity must be greater than 0');
+      alert(t('quantityMustBeGreaterThanZero'));
       return;
     }
 
@@ -102,11 +106,12 @@ export default function SaleModal({ isOpen, onClose, onSuccess }: SaleModalProps
         quantity_sold: 1,
         selling_price: 0,
         sale_date: new Date().toISOString().split('T')[0],
+        notes: '',
       });
       setSelectedProduct(null);
     } catch (error) {
       console.error('Error creating sale:', error);
-      alert(error instanceof Error ? error.message : 'Failed to create sale');
+      alert(error instanceof Error ? error.message : t('failedToCreateSale'));
     } finally {
       setLoading(false);
     }
@@ -116,23 +121,59 @@ export default function SaleModal({ isOpen, onClose, onSuccess }: SaleModalProps
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Record New Sale</DialogTitle>
+          <DialogTitle>{t('recordNewSale')}</DialogTitle>
           <DialogDescription>
-            Create a new sales record and update inventory
+            {t('recordNewSaleDescription')}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="product">Product</Label>
+            <Label htmlFor="product">{t('product')}</Label>
             <Select value={formData.product_id.toString()} onValueChange={handleProductChange}>
               <SelectTrigger>
-                <SelectValue placeholder="Select a product" />
+                {selectedProduct ? (
+                  <div className="flex items-center gap-2">
+                    {selectedProduct.image_url ? (
+                      <Image
+                        src={selectedProduct.image_url}
+                        alt={selectedProduct.name}
+                        width={22}
+                        height={22}
+                        className="rounded object-cover"
+                      />
+                    ) : (
+                      <div className="h-[22px] w-[22px] rounded bg-muted" />
+                    )}
+                    <div className="flex flex-col leading-tight">
+                      <span className="text-sm font-medium">{selectedProduct.name}</span>
+                      <span className="text-xs text-muted-foreground">{t('stock')}: {selectedProduct.stock_quantity}</span>
+                    </div>
+                  </div>
+                ) : (
+                  <SelectValue placeholder={t('selectProduct')} />
+                )}
               </SelectTrigger>
               <SelectContent>
                 {products.map(product => (
                   <SelectItem key={product.id} value={product.id.toString()}>
-                    {product.name} (Stock: {product.stock_quantity})
+                    <div className="flex items-center gap-2">
+                      {product.image_url ? (
+                        <Image
+                          src={product.image_url}
+                          alt={product.name}
+                          width={22}
+                          height={22}
+                          className="rounded object-cover"
+                        />
+                      ) : (
+                        <div className="h-[22px] w-[22px] rounded bg-muted" />
+                      )}
+                      <div className="flex flex-col leading-tight">
+                        <span className="text-sm font-medium">{product.name}</span>
+                        <span className="text-xs text-muted-foreground">{t('stock')}: {product.stock_quantity}</span>
+                      </div>
+                    </div>
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -142,17 +183,17 @@ export default function SaleModal({ isOpen, onClose, onSuccess }: SaleModalProps
           {selectedProduct && (
             <div className="rounded-lg bg-muted p-3 text-sm">
               <p className="text-muted-foreground">
-                Cost Price: <span className="font-semibold text-foreground">${selectedProduct.cost_price.toFixed(2)}</span>
+                {t('costPrice')}: <span className="font-semibold text-foreground">{displayPrice(selectedProduct.cost_price, language)}</span>
               </p>
               <p className="text-muted-foreground">
-                Available Stock: <span className="font-semibold text-foreground">{selectedProduct.stock_quantity}</span>
+                {t('availableStock')}: <span className="font-semibold text-foreground">{selectedProduct.stock_quantity}</span>
               </p>
             </div>
           )}
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="quantity_sold">Quantity Sold</Label>
+              <Label htmlFor="quantity_sold">{t('quantitySold')}</Label>
               <Input
                 id="quantity_sold"
                 name="quantity_sold"
@@ -165,7 +206,7 @@ export default function SaleModal({ isOpen, onClose, onSuccess }: SaleModalProps
             </div>
 
             <div>
-              <Label htmlFor="selling_price">Selling Price ($)</Label>
+              <Label htmlFor="selling_price">{t('sellingPrice')}</Label>
               <Input
                 id="selling_price"
                 name="selling_price"
@@ -179,7 +220,7 @@ export default function SaleModal({ isOpen, onClose, onSuccess }: SaleModalProps
           </div>
 
           <div>
-            <Label htmlFor="sale_date">Sale Date</Label>
+            <Label htmlFor="sale_date">{t('saleDate')}</Label>
             <Input
               id="sale_date"
               name="sale_date"
@@ -190,12 +231,12 @@ export default function SaleModal({ isOpen, onClose, onSuccess }: SaleModalProps
           </div>
 
           <div>
-            <Label htmlFor="notes">Notes</Label>
+            <Label htmlFor="notes">{t('notes')}</Label>
             <textarea
               id="notes"
               value={formData.notes}
               onChange={handleNotesChange}
-              placeholder="Add notes about this sale..."
+              placeholder={t('saleNotesPlaceholder')}
               className="w-full h-16 px-3 py-2 border border-input rounded-md bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
@@ -203,11 +244,11 @@ export default function SaleModal({ isOpen, onClose, onSuccess }: SaleModalProps
           {selectedProduct && formData.selling_price > 0 && (
             <div className="rounded-lg bg-blue-50 p-3">
               <p className="text-sm text-blue-900">
-                Total Amount: <span className="font-semibold">${(formData.quantity_sold * formData.selling_price).toFixed(2)}</span>
+                {t('totalAmount')}: <span className="font-semibold">{displayPrice(formData.quantity_sold * formData.selling_price, language)}</span>
               </p>
               <p className="text-sm text-blue-900">
-                Expected Profit: <span className="font-semibold text-green-600">
-                  ${((formData.selling_price - selectedProduct.cost_price) * formData.quantity_sold).toFixed(2)}
+                {t('expectedProfit')}: <span className="font-semibold text-green-600">
+                  {displayPrice((formData.selling_price - selectedProduct.cost_price) * formData.quantity_sold, language)}
                 </span>
               </p>
             </div>
@@ -215,10 +256,10 @@ export default function SaleModal({ isOpen, onClose, onSuccess }: SaleModalProps
 
           <div className="flex gap-3 justify-end pt-4">
             <Button variant="outline" onClick={onClose}>
-              Cancel
+              {t('cancel')}
             </Button>
             <Button type="submit" disabled={loading || !selectedProduct}>
-              {loading ? 'Recording...' : 'Record Sale'}
+              {loading ? t('recording') : t('recordSale')}
             </Button>
           </div>
         </form>

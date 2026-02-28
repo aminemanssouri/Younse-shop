@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useLanguage } from '@/contexts/language-context';
 
 type Debt = CustomerDebt | SupplierDebt;
 
@@ -19,6 +20,7 @@ interface DebtModalProps {
 }
 
 export default function DebtModal({ isOpen, debt, type, onClose, onSuccess }: DebtModalProps) {
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState(
     type === 'customer'
@@ -74,7 +76,7 @@ export default function DebtModal({ isOpen, debt, type, onClose, onSuccess }: De
       onSuccess();
     } catch (error) {
       console.error(`Error saving ${type} debt:`, error);
-      alert(`Failed to save ${type} debt`);
+      alert(t('saveFailed'));
     } finally {
       setLoading(false);
     }
@@ -85,12 +87,19 @@ export default function DebtModal({ isOpen, debt, type, onClose, onSuccess }: De
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            {debt ? `Edit ${type === 'customer' ? 'Customer' : 'Supplier'} Debt` : `New ${type === 'customer' ? 'Customer' : 'Supplier'} Debt`}
+            {debt
+              ? type === 'customer'
+                ? t('editCustomerDebt')
+                : t('editSupplierDebt')
+              : type === 'customer'
+                ? t('newCustomerDebt')
+                : t('newSupplierDebt')
+            }
           </DialogTitle>
           <DialogDescription>
-            {debt 
-              ? `Update ${type} debt details` 
-              : `Create a new ${type} debt account`
+            {debt
+              ? t('updateDebtDetails')
+              : t('createDebtAccount')
             }
           </DialogDescription>
         </DialogHeader>
@@ -99,69 +108,69 @@ export default function DebtModal({ isOpen, debt, type, onClose, onSuccess }: De
           {type === 'customer' ? (
             <>
               <div>
-                <Label htmlFor="customer_name">Customer Name</Label>
+                <Label htmlFor="customer_name">{t('customerName')}</Label>
                 <Input
                   id="customer_name"
                   name="customer_name"
                   value={(formData as any).customer_name}
                   onChange={handleChange}
-                  placeholder="e.g., Ali's Furniture Store"
+                  placeholder={t('customerNamePlaceholder')}
                   required
                 />
               </div>
 
               <div>
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t('email')}</Label>
                 <Input
                   id="email"
                   name="email"
                   type="email"
                   value={(formData as any).email}
                   onChange={handleChange}
-                  placeholder="customer@example.com"
+                  placeholder={t('emailPlaceholder')}
                 />
               </div>
             </>
           ) : (
             <>
               <div>
-                <Label htmlFor="supplier_name">Supplier Name</Label>
+                <Label htmlFor="supplier_name">{t('supplierName')}</Label>
                 <Input
                   id="supplier_name"
                   name="supplier_name"
                   value={(formData as any).supplier_name}
                   onChange={handleChange}
-                  placeholder="e.g., Persian Imports Inc"
+                  placeholder={t('supplierNamePlaceholder')}
                   required
                 />
               </div>
 
               <div>
-                <Label htmlFor="contact_person">Contact Person</Label>
+                <Label htmlFor="contact_person">{t('contactPerson')}</Label>
                 <Input
                   id="contact_person"
                   name="contact_person"
                   value={(formData as any).contact_person}
                   onChange={handleChange}
-                  placeholder="e.g., Ahmed Khan"
+                  placeholder={t('contactPersonPlaceholder')}
                 />
               </div>
             </>
           )}
 
           <div>
-            <Label htmlFor="phone">Phone</Label>
+            <Label htmlFor="phone">{t('phone')}</Label>
             <Input
               id="phone"
               name="phone"
               value={(formData as any).phone}
               onChange={handleChange}
-              placeholder="+1 (555) 123-4567"
+              placeholder={t('phonePlaceholder')}
             />
           </div>
 
           <div>
-            <Label htmlFor="total_debt">Total Debt ($)</Label>
+            <Label htmlFor="total_debt">{t('totalDebt')}</Label>
             <Input
               id="total_debt"
               name="total_debt"
@@ -175,22 +184,22 @@ export default function DebtModal({ isOpen, debt, type, onClose, onSuccess }: De
           </div>
 
           <div>
-            <Label htmlFor="notes">Notes</Label>
+            <Label htmlFor="notes">{t('notes')}</Label>
             <textarea
               id="notes"
               value={(formData as any).notes}
               onChange={handleNotesChange}
-              placeholder="Add notes about this debt..."
+              placeholder={t('debtNotesPlaceholder')}
               className="w-full h-16 px-3 py-2 border border-input rounded-md bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
 
           <div className="flex gap-3 justify-end pt-4">
             <Button variant="outline" onClick={onClose}>
-              Cancel
+              {t('cancel')}
             </Button>
             <Button type="submit" disabled={loading}>
-              {loading ? 'Saving...' : 'Save Debt'}
+              {loading ? t('saving') : t('saveDebt')}
             </Button>
           </div>
         </form>

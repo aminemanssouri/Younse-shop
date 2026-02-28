@@ -2,10 +2,11 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BarChart3, Package, ShoppingCart, Users, DollarSign, Globe } from 'lucide-react';
+import { BarChart3, Package, ShoppingCart, Users, DollarSign, Globe, Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/language-context';
 import { Language } from '@/lib/translations';
+import { useState } from 'react';
 import {
   Select,
   SelectContent,
@@ -13,10 +14,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 export default function Navigation() {
   const pathname = usePathname();
   const { language, setLanguage, t } = useLanguage();
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   const navItems = [
     {
@@ -81,6 +85,60 @@ export default function Navigation() {
           </div>
 
           <div className="flex items-center gap-4">
+            <Sheet open={isMobileOpen} onOpenChange={setIsMobileOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="md:hidden" aria-label={t('menu')}>
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="p-0">
+                <SheetHeader className="border-b border-border p-4">
+                  <SheetTitle className="flex items-center gap-2">
+                    <BarChart3 className="h-5 w-5" />
+                    <span>Younes Shop</span>
+                  </SheetTitle>
+                </SheetHeader>
+
+                <div className="p-2">
+                  {navItems.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = pathname === item.href;
+
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={() => setIsMobileOpen(false)}
+                        className={cn(
+                          'flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors',
+                          isActive
+                            ? 'bg-primary text-primary-foreground'
+                            : 'text-foreground hover:bg-muted'
+                        )}
+                      >
+                        <Icon className="h-4 w-4" />
+                        <span>{item.label}</span>
+                      </Link>
+                    );
+                  })}
+
+                  <div className="mt-2 border-t border-border pt-3 px-2">
+                    <div className="text-xs text-muted-foreground mb-2">{t('language')}</div>
+                    <Select value={language} onValueChange={(value) => setLanguage(value as Language)}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="en">English</SelectItem>
+                        <SelectItem value="fr">Français</SelectItem>
+                        <SelectItem value="ar">العربية</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
+
             <Select value={language} onValueChange={(value) => setLanguage(value as Language)}>
               <SelectTrigger className="w-10 h-9 border-0 px-0">
                 <Globe className="h-4 w-4 text-muted-foreground" />

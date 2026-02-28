@@ -59,20 +59,20 @@ export default function SalesPage() {
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-bold tracking-tight text-foreground">Sales</h1>
-            <p className="mt-2 text-lg text-muted-foreground">Track your sales transactions</p>
+            <h1 className="text-4xl font-bold tracking-tight text-foreground">{t('sales')}</h1>
+            <p className="mt-2 text-lg text-muted-foreground">{t('salesSubtitle')}</p>
           </div>
           <Button onClick={handleNew} className="gap-2">
             <Plus className="h-4 w-4" />
-            New Sale
+            {t('newSale')}
           </Button>
         </div>
 
         {/* Sales Table */}
         <Card>
           <CardHeader>
-            <CardTitle>Sales Records</CardTitle>
-            <CardDescription>View all sales transactions with revenue and profit details</CardDescription>
+            <CardTitle>{t('salesRecords')}</CardTitle>
+            <CardDescription>{t('salesRecordsDescription')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="mb-4 grid grid-cols-1 gap-2 md:grid-cols-5">

@@ -18,11 +18,11 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-background">
       <Navigation />
       
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold tracking-tight text-foreground">{t('dashboard')}</h1>
-          <p className="mt-2 text-lg text-muted-foreground">Manage Younes Shop efficiently</p>
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-4xl">{t('dashboard')}</h1>
+          <p className="mt-2 text-sm text-muted-foreground sm:text-lg">{t('dashboardSubtitle')}</p>
         </div>
 
         {/* KPI Cards Grid */}
@@ -41,24 +41,28 @@ export default function DashboardPage() {
                 value={stats.totalRevenue} 
                 icon={DollarSign}
                 format="currency"
+                accent="blue"
               />
               <KPICard 
                 title={t('totalProfit')} 
                 value={stats.totalProfit} 
                 icon={TrendingUp}
                 format="currency"
+                accent="green"
               />
               <KPICard 
                 title={t('productsInStock')} 
                 value={stats.totalProducts} 
                 icon={Package}
                 format="number"
+                accent="purple"
               />
               <KPICard 
                 title={t('stockValue')} 
                 value={stats.totalStockValue} 
                 icon={Activity}
                 format="currency"
+                accent="amber"
               />
             </>
           )}
@@ -68,8 +72,8 @@ export default function DashboardPage() {
         {salesLoading ? (
           <Skeleton className="h-96" />
         ) : (
-          <div className="rounded-lg border border-border bg-card p-6 shadow-sm">
-            <h2 className="mb-6 text-xl font-semibold text-foreground">{t('salesTrend')}</h2>
+          <div className="rounded-lg border border-border bg-card/80 p-4 shadow-sm ring-1 ring-blue-500/10 sm:p-6">
+            <h2 className="mb-4 text-lg font-semibold text-foreground sm:mb-6 sm:text-xl">{t('salesTrend')}</h2>
             <SalesChart sales={sales} />
           </div>
         )}
