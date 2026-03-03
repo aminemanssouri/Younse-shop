@@ -41,6 +41,8 @@ export const translations: Record<Language, Record<string, string>> = {
 
     productNotesPlaceholder: 'Add notes about this product...',
 
+    skuAlreadyExists: 'A product with this SKU already exists',
+
     imagePreview: 'Image preview',
     imageTypes: 'PNG, JPG, or WebP',
     uploadFailed: 'Upload failed',
@@ -225,6 +227,8 @@ export const translations: Record<Language, Record<string, string>> = {
     selling: 'Vente',
 
     productNotesPlaceholder: 'Ajouter des notes sur ce produit...',
+
+    skuAlreadyExists: 'Un produit avec ce SKU existe déjà',
 
     imagePreview: 'Aperçu de l\'image',
     imageTypes: 'PNG, JPG, ou WebP',
@@ -474,6 +478,8 @@ export const translations: Record<Language, Record<string, string>> = {
     emailPlaceholder: 'customer@example.com',
     phonePlaceholder: '+212 6 00 00 00 00',
     productNotesPlaceholder: 'أضف ملاحظات حول هذا المنتج...',
+
+    skuAlreadyExists: 'يوجد منتج بهذا المعرف (SKU) بالفعل',
 
     imagePreview: 'معاينة الصورة',
     imageTypes: 'PNG أو JPG أو WebP',

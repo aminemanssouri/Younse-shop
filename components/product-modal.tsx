@@ -82,7 +82,12 @@ export default function ProductModal({ isOpen, product, onClose, onSuccess }: Pr
       onSuccess();
     } catch (error) {
       console.error('Error saving product:', error);
-      alert(t('saveFailed'));
+      const message = (error as any)?.message;
+      if (message === 'SKU_ALREADY_EXISTS') {
+        alert(t('skuAlreadyExists'));
+      } else {
+        alert(t('saveFailed'));
+      }
     } finally {
       setLoading(false);
     }

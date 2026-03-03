@@ -29,12 +29,35 @@ export async function getProduct(id: number): Promise<Product | undefined> {
 
 export async function addProduct(data: Omit<Product, 'id' | 'created_at' | 'updated_at'>): Promise<void> {
   const supabase = getSupabaseAdmin();
+
+  if (data.sku) {
+    const { data: existing, error: existingError } = await supabase
+      .from('products')
+      .select('id')
+      .eq('sku', data.sku)
+      .limit(1);
+    if (existingError) throw new Error(existingError.message);
+    if ((existing ?? []).length > 0) throw new Error('SKU_ALREADY_EXISTS');
+  }
+
   const { error } = await supabase.from('products').insert(data);
   if (error) throw new Error(error.message);
 }
 
 export async function updateProduct(id: number, data: Partial<Omit<Product, 'id' | 'created_at' | 'updated_at'>>): Promise<void> {
   const supabase = getSupabaseAdmin();
+
+  if (data.sku) {
+    const { data: existing, error: existingError } = await supabase
+      .from('products')
+      .select('id')
+      .eq('sku', data.sku)
+      .neq('id', id)
+      .limit(1);
+    if (existingError) throw new Error(existingError.message);
+    if ((existing ?? []).length > 0) throw new Error('SKU_ALREADY_EXISTS');
+  }
+
   const { error } = await supabase.from('products').update(data).eq('id', id);
   if (error) throw new Error(error.message);
 }
