@@ -21,6 +21,7 @@ interface ProductModalProps {
 export default function ProductModal({ isOpen, product, onClose, onSuccess }: ProductModalProps) {
   const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: product?.name || '',
     sku: product?.sku || '',
@@ -35,6 +36,7 @@ export default function ProductModal({ isOpen, product, onClose, onSuccess }: Pr
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    setErrorMessage(null);
     setFormData(prev => ({
       ...prev,
       [name]: name.includes('quantity') || name.includes('price') ? parseFloat(value) || 0 : value,
@@ -42,6 +44,7 @@ export default function ProductModal({ isOpen, product, onClose, onSuccess }: Pr
   };
 
   const handleMeasurementChange = (value: string) => {
+    setErrorMessage(null);
     setFormData(prev => ({
       ...prev,
       measurement_unit: value,
@@ -49,6 +52,7 @@ export default function ProductModal({ isOpen, product, onClose, onSuccess }: Pr
   };
 
   const handleImageChange = (url: string | null) => {
+    setErrorMessage(null);
     setFormData(prev => ({
       ...prev,
       image_url: url,
@@ -56,6 +60,7 @@ export default function ProductModal({ isOpen, product, onClose, onSuccess }: Pr
   };
 
   const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setErrorMessage(null);
     setFormData(prev => ({
       ...prev,
       color: e.target.value,
@@ -63,6 +68,7 @@ export default function ProductModal({ isOpen, product, onClose, onSuccess }: Pr
   };
 
   const handleNotesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setErrorMessage(null);
     setFormData(prev => ({
       ...prev,
       notes: e.target.value,
@@ -72,6 +78,7 @@ export default function ProductModal({ isOpen, product, onClose, onSuccess }: Pr
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setErrorMessage(null);
 
     try {
       if (product) {
@@ -82,11 +89,11 @@ export default function ProductModal({ isOpen, product, onClose, onSuccess }: Pr
       onSuccess();
     } catch (error) {
       console.error('Error saving product:', error);
-      const message = (error as any)?.message;
-      if (message === 'SKU_ALREADY_EXISTS') {
-        alert(t('skuAlreadyExists'));
+      const message = String((error as any)?.message || '');
+      if (message.includes('SKU_ALREADY_EXISTS')) {
+        setErrorMessage(t('skuAlreadyExists'));
       } else {
-        alert(t('saveFailed'));
+        setErrorMessage(t('saveFailed'));
       }
     } finally {
       setLoading(false);
@@ -104,6 +111,11 @@ export default function ProductModal({ isOpen, product, onClose, onSuccess }: Pr
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {errorMessage && (
+            <div className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+              {errorMessage}
+            </div>
+          )}
           <ImageInput
             value={formData.image_url}
             onChange={handleImageChange}
