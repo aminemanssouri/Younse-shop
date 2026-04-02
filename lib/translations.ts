@@ -11,11 +11,18 @@ export const translations: Record<Language, Record<string, string>> = {
     language: 'Language',
     currency: 'Currency',
 
-    dashboardSubtitle: 'Manage Younes Shop efficiently',
+    dashboardSubtitle: 'Overview of your business performance',
     
     // Dashboard
     totalRevenue: 'Total Revenue',
     totalProfit: 'Total Profit',
+    dailyRevenue: 'Daily Revenue',
+    dailyProfit: 'Daily Profit',
+    totalCost: 'Total Cost',
+    downloadPDF: 'Download PDF',
+    downloading: 'Downloading...',
+    downloadFailed: 'Download failed',
+    dailySalesReport: 'Daily Sales Report',
     productsInStock: 'Products in Stock',
     stockValue: 'Stock Value',
     salesTrend: 'Sales Trend',
@@ -42,6 +49,7 @@ export const translations: Record<Language, Record<string, string>> = {
     productNotesPlaceholder: 'Add notes about this product...',
 
     skuAlreadyExists: 'A product with this SKU already exists',
+    invalidColor: 'Invalid color (use: red, blue, white, or #3b82f6)',
 
     imagePreview: 'Image preview',
     imageTypes: 'PNG, JPG, or WebP',
@@ -151,7 +159,6 @@ export const translations: Record<Language, Record<string, string>> = {
     width: 'Width',
     pricePerUnit: 'Price per Unit',
     totalArea: 'Total Area',
-    totalCost: 'Total Cost',
     calculate: 'Calculate',
     
     // Actions
@@ -198,11 +205,18 @@ export const translations: Record<Language, Record<string, string>> = {
     language: 'Langue',
     currency: 'Devise',
 
-    dashboardSubtitle: 'Gérez Younes Shop efficacement',
+    dashboardSubtitle: 'Aperçu des performances de votre entreprise',
     
     // Dashboard
     totalRevenue: 'Revenu total',
-    totalProfit: 'Profit total',
+    totalProfit: 'Bénéfice total',
+    dailyRevenue: 'Revenu du jour',
+    dailyProfit: 'Bénéfice du jour',
+    totalCost: 'Coût total',
+    downloadPDF: 'Télécharger PDF',
+    downloading: 'Téléchargement...',
+    downloadFailed: 'Échec du téléchargement',
+    dailySalesReport: 'Rapport des ventes du jour',
     productsInStock: 'Produits en stock',
     stockValue: 'Valeur du stock',
     salesTrend: 'Tendance des ventes',
@@ -229,6 +243,7 @@ export const translations: Record<Language, Record<string, string>> = {
     productNotesPlaceholder: 'Ajouter des notes sur ce produit...',
 
     skuAlreadyExists: 'Un produit avec ce SKU existe déjà',
+    invalidColor: 'Couleur invalide (utilisez: red, blue, white, ou #3b82f6)',
 
     imagePreview: 'Aperçu de l\'image',
     imageTypes: 'PNG, JPG, ou WebP',
@@ -338,7 +353,6 @@ export const translations: Record<Language, Record<string, string>> = {
     width: 'Largeur',
     pricePerUnit: 'Prix par unité',
     totalArea: 'Surface totale',
-    totalCost: 'Coût total',
     calculate: 'Calculer',
     
     // Actions
@@ -385,11 +399,18 @@ export const translations: Record<Language, Record<string, string>> = {
     language: 'اللغة',
     currency: 'العملة',
 
-    dashboardSubtitle: 'إدارة Younes Shop بكفاءة',
+    dashboardSubtitle: 'نظرة عامة على أداء عملك',
     
     // Dashboard
     totalRevenue: 'إجمالي الإيرادات',
-    totalProfit: 'إجمالي الربح',
+    totalProfit: 'إجمالي الأرباح',
+    dailyRevenue: 'إيرادات اليوم',
+    dailyProfit: 'أرباح اليوم',
+    totalCost: 'التكلفة الإجمالية',
+    downloadPDF: 'تحميل PDF',
+    downloading: 'جارٍ التحميل...',
+    downloadFailed: 'فشل التحميل',
+    dailySalesReport: 'تقرير مبيعات اليوم',
     productsInStock: 'المنتجات المتاحة',
     stockValue: 'قيمة المخزون',
     salesTrend: 'اتجاه المبيعات',
@@ -480,6 +501,7 @@ export const translations: Record<Language, Record<string, string>> = {
     productNotesPlaceholder: 'أضف ملاحظات حول هذا المنتج...',
 
     skuAlreadyExists: 'يوجد منتج بهذا المعرف (SKU) بالفعل',
+    invalidColor: 'لون غير صالح (استخدم: red, blue, white, أو #3b82f6)',
 
     imagePreview: 'معاينة الصورة',
     imageTypes: 'PNG أو JPG أو WebP',
@@ -517,7 +539,6 @@ export const translations: Record<Language, Record<string, string>> = {
     width: 'العرض',
     pricePerUnit: 'السعر لكل وحدة',
     totalArea: 'إجمالي المساحة',
-    totalCost: 'التكلفة الإجمالية',
     calculate: 'حساب',
     
     // Actions

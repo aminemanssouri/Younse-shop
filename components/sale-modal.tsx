@@ -183,9 +183,6 @@ export default function SaleModal({ isOpen, onClose, onSuccess }: SaleModalProps
           {selectedProduct && (
             <div className="rounded-lg bg-muted p-3 text-sm">
               <p className="text-muted-foreground">
-                {t('costPrice')}: <span className="font-semibold text-foreground">{displayPrice(selectedProduct.cost_price, language)}</span>
-              </p>
-              <p className="text-muted-foreground">
                 {t('availableStock')}: <span className="font-semibold text-foreground">{selectedProduct.stock_quantity}</span>
               </p>
             </div>

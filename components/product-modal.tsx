@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Product } from '@/lib/types';
 import * as actions from '@/app/actions';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -34,6 +34,35 @@ export default function ProductModal({ isOpen, product, onClose, onSuccess }: Pr
     notes: product?.notes || '',
   });
 
+  useEffect(() => {
+    if (product) {
+      setFormData({
+        name: product.name || '',
+        sku: product.sku || '',
+        stock_quantity: product.stock_quantity || 0,
+        cost_price: product.cost_price || 0,
+        selling_price: product.selling_price || 0,
+        image_url: product.image_url || null,
+        measurement_unit: product.measurement_unit || 'pce',
+        color: product.color || '#3b82f6',
+        notes: product.notes || '',
+      });
+    } else {
+      setFormData({
+        name: '',
+        sku: '',
+        stock_quantity: 0,
+        cost_price: 0,
+        selling_price: 0,
+        image_url: null,
+        measurement_unit: 'pce',
+        color: '#3b82f6',
+        notes: '',
+      });
+    }
+    setErrorMessage(null);
+  }, [product, isOpen]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setErrorMessage(null);
@@ -61,10 +90,24 @@ export default function ProductModal({ isOpen, product, onClose, onSuccess }: Pr
 
   const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setErrorMessage(null);
+    const value = e.target.value.trim();
     setFormData(prev => ({
       ...prev,
-      color: e.target.value,
+      color: value,
     }));
+  };
+
+  const isValidColor = (color: string): boolean => {
+    if (!color) return false;
+    
+    // Check if it's a valid hex code
+    const hexPattern = /^#([0-9A-Fa-f]{3}){1,2}$/;
+    if (hexPattern.test(color)) return true;
+    
+    // Check if it's a valid CSS color name by testing it in a temporary element
+    const testElement = document.createElement('div');
+    testElement.style.color = color;
+    return testElement.style.color !== '';
   };
 
   const handleNotesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -205,13 +248,20 @@ export default function ProductModal({ isOpen, product, onClose, onSuccess }: Pr
             <div className="flex gap-2 items-center">
               <Input
                 id="color"
-                type="color"
+                type="text"
                 value={formData.color}
                 onChange={handleColorChange}
-                className="h-10 w-20 cursor-pointer"
+                placeholder="red, blue, white, #3b82f6"
+                className="flex-1"
               />
-              <span className="text-sm text-muted-foreground">{formData.color}</span>
+              <div
+                className="h-10 w-10 rounded border border-input"
+                style={{ backgroundColor: isValidColor(formData.color) ? formData.color : '#cccccc' }}
+              />
             </div>
+            {formData.color && !isValidColor(formData.color) && (
+              <p className="mt-1 text-xs text-destructive">{t('invalidColor')}</p>
+            )}
           </div>
 
           <div>

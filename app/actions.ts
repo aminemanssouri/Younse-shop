@@ -236,8 +236,22 @@ export async function getDashboardStats(): Promise<{
 }> {
   const [products, sales] = await Promise.all([getProducts(), getSales()]);
 
-  const totalRevenue = sales.reduce((sum, sale) => sum + (sale.total_amount || 0), 0);
-  const totalProfit = sales.reduce((sum, sale) => sum + (sale.profit_amount || 0), 0);
+  const today = new Date();
+  const todayYear = today.getFullYear();
+  const todayMonth = today.getMonth();
+  const todayDay = today.getDate();
+
+  const todaySales = sales.filter(sale => {
+    const saleDate = new Date(sale.sale_date);
+    return (
+      saleDate.getFullYear() === todayYear &&
+      saleDate.getMonth() === todayMonth &&
+      saleDate.getDate() === todayDay
+    );
+  });
+
+  const totalRevenue = todaySales.reduce((sum, sale) => sum + (sale.total_amount || 0), 0);
+  const totalProfit = todaySales.reduce((sum, sale) => sum + (sale.profit_amount || 0), 0);
   const totalStockValue = products.reduce((sum, p) => sum + (p.stock_quantity * p.cost_price), 0);
 
   return {
@@ -245,6 +259,62 @@ export async function getDashboardStats(): Promise<{
     totalProfit,
     totalProducts: products.length,
     totalStockValue,
+  };
+}
+
+export async function getDailySalesReport(): Promise<{
+  date: string;
+  sales: Array<{
+    product_name: string;
+    quantity_sold: number;
+    selling_price: number;
+    total_amount: number;
+    profit_amount: number;
+  }>;
+  totalRevenue: number;
+  totalProfit: number;
+  totalCost: number;
+}> {
+  const [products, sales] = await Promise.all([getProducts(), getSales()]);
+
+  const today = new Date();
+  const todayYear = today.getFullYear();
+  const todayMonth = today.getMonth();
+  const todayDay = today.getDate();
+  const todayStr = today.toISOString().split('T')[0];
+
+  const todaySales = sales.filter(sale => {
+    const saleDate = new Date(sale.sale_date);
+    return (
+      saleDate.getFullYear() === todayYear &&
+      saleDate.getMonth() === todayMonth &&
+      saleDate.getDate() === todayDay
+    );
+  });
+
+  const productsMap = new Map(products.map(p => [p.id, p]));
+
+  const salesWithDetails = todaySales.map(sale => {
+    const product = productsMap.get(sale.product_id);
+    return {
+      product_name: product?.name || `Product ${sale.product_id}`,
+      quantity_sold: sale.quantity_sold,
+      selling_price: sale.selling_price,
+      total_amount: sale.total_amount,
+      profit_amount: sale.profit_amount,
+    };
+  });
+
+  const totalRevenue = todaySales.reduce((sum, sale) => sum + (sale.total_amount || 0), 0);
+  const totalProfit = todaySales.reduce((sum, sale) => sum + (sale.profit_amount || 0), 0);
+  const totalCost = totalRevenue - totalProfit;
+
+  return {
+    date: todayStr,
+    sales: salesWithDetails,
+    totalRevenue,
+    totalProfit,
+    totalCost,
   };
 }
 
