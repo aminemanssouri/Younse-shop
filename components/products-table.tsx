@@ -2,7 +2,7 @@
 
 import { Product } from '@/lib/types';
 import { Button } from '@/components/ui/button';
-import { Trash2, Pencil, Eye } from 'lucide-react';
+import { Trash2, Pencil, Eye, Palette } from 'lucide-react';
 import Image from 'next/image';
 import * as actions from '@/app/actions';
 import { useLanguage } from '@/contexts/language-context';
@@ -87,14 +87,23 @@ export default function ProductsTable({ products, onEdit, onRefresh }: ProductsT
                 <td className="px-4 py-3 font-medium text-foreground">{product.name}</td>
                 <td className="px-4 py-3 text-muted-foreground text-xs">{product.sku}</td>
                 <td className="px-4 py-3 text-center">
-                  <div className="flex items-center justify-center gap-2">
-                    <div
-                      className="w-6 h-6 rounded border border-gray-300"
-                      style={{ backgroundColor: product.color || '#3b82f6' }}
-                      title={product.color}
-                    />
-                    <span className="text-xs text-muted-foreground">{product.color}</span>
-                  </div>
+                  {product.variants && product.variants.length > 0 ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <Palette className="w-5 h-5 text-purple-600" />
+                      <span className="text-xs text-muted-foreground">
+                        {product.variants.length} {t('colors')}
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center gap-2">
+                      <div
+                        className="w-6 h-6 rounded border border-gray-300"
+                        style={{ backgroundColor: product.color || '#cccccc' }}
+                        title={product.color}
+                      />
+                      <span className="text-xs text-muted-foreground">{product.color || '-'}</span>
+                    </div>
+                  )}
                 </td>
                 <td className="px-4 py-3 text-center text-xs bg-muted/30 rounded">
                   {getMeasurementLabel(product.measurement_unit)}

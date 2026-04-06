@@ -1,21 +1,32 @@
+export interface ProductVariant {
+  id: number;
+  product_id: number;
+  color: string;
+  stock_quantity: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Product {
   id: number;
   name: string;
   sku: string;
-  stock_quantity: number;
+  stock_quantity: number; // Total stock across all variants (calculated)
   cost_price: number;
   selling_price: number;
   image_url?: string | null;
   measurement_unit?: string; // 'm' for meter or 'pce' for piece
-  color?: string; // product color
+  color?: string; // Legacy field - kept for backward compatibility
   notes?: string; // product notes
   created_at: string;
   updated_at: string;
+  variants?: ProductVariant[]; // Color variants with individual stock
 }
 
 export interface Sale {
   id: number;
   product_id: number;
+  variant_id?: number; // Which color variant was sold
   quantity_sold: number;
   selling_price: number;
   total_amount: number;

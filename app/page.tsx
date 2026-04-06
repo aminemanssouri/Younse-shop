@@ -1,6 +1,6 @@
 'use client';
 
-import { DollarSign, Package, TrendingUp, Activity, Download } from 'lucide-react';
+import { DollarSign, Package, TrendingUp, Activity, Download, Calendar } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useDashboardStats } from '@/hooks/use-dashboard-stats';
 import { useSales } from '@/hooks/use-sales';
@@ -9,6 +9,9 @@ import { SalesChart } from '@/components/sales-chart';
 import Navigation from '@/components/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useLanguage } from '@/contexts/language-context';
 
 export default function DashboardPage() {
@@ -16,6 +19,8 @@ export default function DashboardPage() {
   const { stats, loading: statsLoading, refetch: refetchStats } = useDashboardStats();
   const { sales, loading: salesLoading, refetch: refetchSales } = useSales();
   const [downloading, setDownloading] = useState(false);
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
 
   // Auto-refresh dashboard every 30 seconds for live updates
   useEffect(() => {
@@ -40,11 +45,11 @@ export default function DashboardPage() {
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, [refetchStats, refetchSales]);
 
-  const handleDownloadPDF = async () => {
+  const downloadReportForDate = async (dateStr: string) => {
     setDownloading(true);
     try {
-      const { getDailySalesReport } = await import('@/app/actions');
-      const report = await getDailySalesReport();
+      const { getDailySalesReportByDate } = await import('@/app/actions');
+      const report = await getDailySalesReportByDate(dateStr);
       
       const printWindow = window.open('', '_blank');
       if (!printWindow) {
@@ -147,6 +152,16 @@ export default function DashboardPage() {
     }
   };
 
+  const handleDownloadToday = () => {
+    const today = new Date().toISOString().split('T')[0];
+    downloadReportForDate(today);
+  };
+
+  const handleDownloadSelectedDate = () => {
+    downloadReportForDate(selectedDate);
+    setIsDatePickerOpen(false);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -159,10 +174,43 @@ export default function DashboardPage() {
               <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-4xl">{t('dashboard')}</h1>
               <p className="mt-2 text-sm text-muted-foreground sm:text-lg">{t('dashboardSubtitle')}</p>
             </div>
-            <Button onClick={handleDownloadPDF} disabled={downloading} className="gap-2">
-              <Download className="h-4 w-4" />
-              <span className="hidden sm:inline">{downloading ? t('downloading') : t('downloadPDF')}</span>
-            </Button>
+            <div className="flex gap-2">
+              <Button onClick={handleDownloadToday} disabled={downloading} className="gap-2">
+                <Download className="h-4 w-4" />
+                <span className="hidden sm:inline">{downloading ? t('downloading') : t('downloadPDF')}</span>
+              </Button>
+              <Dialog open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" disabled={downloading} className="gap-2">
+                    <Calendar className="h-4 w-4" />
+                    <span className="hidden sm:inline">{t('selectDate')}</span>
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>{t('downloadReportForDate')}</DialogTitle>
+                    <DialogDescription>
+                      {t('selectDateToDownload')}
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="report-date">{t('date')}</Label>
+                      <Input
+                        id="report-date"
+                        type="date"
+                        value={selectedDate}
+                        onChange={(e) => setSelectedDate(e.target.value)}
+                        max={new Date().toISOString().split('T')[0]}
+                      />
+                    </div>
+                    <Button onClick={handleDownloadSelectedDate} disabled={downloading} className="w-full">
+                      {downloading ? t('downloading') : t('download')}
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
           </div>
         </div>
 

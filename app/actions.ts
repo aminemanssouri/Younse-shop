@@ -1,7 +1,38 @@
 'use server';
 
-import { Product, Sale, CustomerDebt, SupplierDebt } from '@/lib/types';
+import { Product, ProductVariant, Sale, CustomerDebt, SupplierDebt } from '@/lib/types';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
+
+// PRODUCT VARIANTS ACTIONS
+export async function getProductVariants(productId: number): Promise<ProductVariant[]> {
+  const supabase = getSupabaseAdmin();
+  const { data, error } = await supabase
+    .from('product_variants')
+    .select('*')
+    .eq('product_id', productId)
+    .order('color', { ascending: true });
+
+  if (error) throw new Error(error.message);
+  return (data ?? []) as ProductVariant[];
+}
+
+export async function addProductVariant(variant: Omit<ProductVariant, 'id' | 'created_at' | 'updated_at'>): Promise<void> {
+  const supabase = getSupabaseAdmin();
+  const { error } = await supabase.from('product_variants').insert(variant);
+  if (error) throw new Error(error.message);
+}
+
+export async function updateProductVariant(id: number, data: Partial<Omit<ProductVariant, 'id' | 'created_at' | 'updated_at'>>): Promise<void> {
+  const supabase = getSupabaseAdmin();
+  const { error } = await supabase.from('product_variants').update(data).eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+export async function deleteProductVariant(id: number): Promise<void> {
+  const supabase = getSupabaseAdmin();
+  const { error } = await supabase.from('product_variants').delete().eq('id', id);
+  if (error) throw new Error(error.message);
+}
 
 // PRODUCTS ACTIONS
 export async function getProducts(): Promise<Product[]> {
@@ -12,7 +43,25 @@ export async function getProducts(): Promise<Product[]> {
     .order('created_at', { ascending: false });
 
   if (error) throw new Error(error.message);
-  return (data ?? []) as Product[];
+  
+  // Fetch variants for each product (with error handling for backward compatibility)
+  const products = (data ?? []) as Product[];
+  for (const product of products) {
+    try {
+      const variants = await getProductVariants(product.id);
+      product.variants = variants;
+      // Calculate total stock from variants if they exist
+      if (variants.length > 0) {
+        product.stock_quantity = variants.reduce((sum: number, v: ProductVariant) => sum + v.stock_quantity, 0);
+      }
+    } catch (err) {
+      // If variants table doesn't exist yet (before migration), use legacy stock_quantity
+      product.variants = [];
+      // stock_quantity already exists in product data
+    }
+  }
+  
+  return products;
 }
 
 export async function getProduct(id: number): Promise<Product | undefined> {
@@ -95,26 +144,58 @@ export async function getSale(id: number): Promise<Sale | undefined> {
 export async function addSale(data: Omit<Sale, 'id' | 'created_at'>): Promise<void> {
   const product = await getProduct(data.product_id);
   if (!product) throw new Error('Product not found');
-  if (product.stock_quantity < data.quantity_sold) throw new Error('Insufficient stock');
   
-  const profitAmount = (data.selling_price - product.cost_price) * data.quantity_sold;
-
   const supabase = getSupabaseAdmin();
+  
+  // If variant_id is provided, update variant stock
+  if (data.variant_id) {
+    const { data: variantData, error: variantError } = await supabase
+      .from('product_variants')
+      .select('*')
+      .eq('id', data.variant_id)
+      .maybeSingle();
+    
+    if (variantError) throw new Error(variantError.message);
+    if (!variantData) throw new Error('Variant not found');
+    
+    const variant = variantData as ProductVariant;
+    if (variant.stock_quantity < data.quantity_sold) throw new Error('Insufficient stock for this color');
+    
+    const profitAmount = (data.selling_price - product.cost_price) * data.quantity_sold;
 
-  const { error: insertError } = await supabase.from('sales').insert({
-    ...data,
-    profit_amount: profitAmount,
-  });
+    // Insert sale
+    const { error: insertError } = await supabase.from('sales').insert({
+      ...data,
+      profit_amount: profitAmount,
+    });
+    if (insertError) throw new Error(insertError.message);
 
-  if (insertError) throw new Error(insertError.message);
+    // Update variant stock
+    const newVariantStock = variant.stock_quantity - data.quantity_sold;
+    const { error: updateError } = await supabase
+      .from('product_variants')
+      .update({ stock_quantity: newVariantStock })
+      .eq('id', data.variant_id);
+    if (updateError) throw new Error(updateError.message);
+  } else {
+    // Legacy: no variant specified, use old logic
+    if (product.stock_quantity < data.quantity_sold) throw new Error('Insufficient stock');
+    
+    const profitAmount = (data.selling_price - product.cost_price) * data.quantity_sold;
 
-  const newStock = product.stock_quantity - data.quantity_sold;
-  const { error: updateError } = await supabase
-    .from('products')
-    .update({ stock_quantity: newStock })
-    .eq('id', data.product_id);
+    const { error: insertError } = await supabase.from('sales').insert({
+      ...data,
+      profit_amount: profitAmount,
+    });
+    if (insertError) throw new Error(insertError.message);
 
-  if (updateError) throw new Error(updateError.message);
+    const newStock = product.stock_quantity - data.quantity_sold;
+    const { error: updateError } = await supabase
+      .from('products')
+      .update({ stock_quantity: newStock })
+      .eq('id', data.product_id);
+    if (updateError) throw new Error(updateError.message);
+  }
 }
 
 export async function deleteSale(id: number): Promise<void> {
@@ -275,26 +356,43 @@ export async function getDailySalesReport(): Promise<{
   totalProfit: number;
   totalCost: number;
 }> {
+  const today = new Date();
+  const todayStr = today.toISOString().split('T')[0];
+  return getDailySalesReportByDate(todayStr);
+}
+
+export async function getDailySalesReportByDate(dateStr: string): Promise<{
+  date: string;
+  sales: Array<{
+    product_name: string;
+    quantity_sold: number;
+    selling_price: number;
+    total_amount: number;
+    profit_amount: number;
+  }>;
+  totalRevenue: number;
+  totalProfit: number;
+  totalCost: number;
+}> {
   const [products, sales] = await Promise.all([getProducts(), getSales()]);
 
-  const today = new Date();
-  const todayYear = today.getFullYear();
-  const todayMonth = today.getMonth();
-  const todayDay = today.getDate();
-  const todayStr = today.toISOString().split('T')[0];
+  const targetDate = new Date(dateStr);
+  const targetYear = targetDate.getFullYear();
+  const targetMonth = targetDate.getMonth();
+  const targetDay = targetDate.getDate();
 
-  const todaySales = sales.filter(sale => {
+  const daySales = sales.filter(sale => {
     const saleDate = new Date(sale.sale_date);
     return (
-      saleDate.getFullYear() === todayYear &&
-      saleDate.getMonth() === todayMonth &&
-      saleDate.getDate() === todayDay
+      saleDate.getFullYear() === targetYear &&
+      saleDate.getMonth() === targetMonth &&
+      saleDate.getDate() === targetDay
     );
   });
 
   const productsMap = new Map(products.map(p => [p.id, p]));
 
-  const salesWithDetails = todaySales.map(sale => {
+  const salesWithDetails = daySales.map(sale => {
     const product = productsMap.get(sale.product_id);
     return {
       product_name: product?.name || `Product ${sale.product_id}`,
@@ -305,12 +403,12 @@ export async function getDailySalesReport(): Promise<{
     };
   });
 
-  const totalRevenue = todaySales.reduce((sum, sale) => sum + (sale.total_amount || 0), 0);
-  const totalProfit = todaySales.reduce((sum, sale) => sum + (sale.profit_amount || 0), 0);
+  const totalRevenue = daySales.reduce((sum, sale) => sum + (sale.total_amount || 0), 0);
+  const totalProfit = daySales.reduce((sum, sale) => sum + (sale.profit_amount || 0), 0);
   const totalCost = totalRevenue - totalProfit;
 
   return {
-    date: todayStr,
+    date: dateStr,
     sales: salesWithDetails,
     totalRevenue,
     totalProfit,

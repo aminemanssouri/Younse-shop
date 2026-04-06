@@ -23,13 +23,18 @@ export default function SaleModal({ isOpen, onClose, onSuccess }: SaleModalProps
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedVariantId, setSelectedVariantId] = useState<number | null>(null);
   const [formData, setFormData] = useState({
     product_id: 0,
+    variant_id: undefined as number | undefined,
     quantity_sold: 1,
-    selling_price: 0,
+    total_price: 0,
     sale_date: new Date().toISOString().split('T')[0],
     notes: '',
   });
+
+  // Calculate price per unit from total price
+  const pricePerUnit = formData.quantity_sold > 0 ? formData.total_price / formData.quantity_sold : 0;
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -49,10 +54,21 @@ export default function SaleModal({ isOpen, onClose, onSuccess }: SaleModalProps
   const handleProductChange = (value: string) => {
     const product = products.find(p => p.id === parseInt(value));
     setSelectedProduct(product || null);
+    setSelectedVariantId(null);
     setFormData(prev => ({
       ...prev,
       product_id: parseInt(value),
-      selling_price: product?.selling_price || 0,
+      variant_id: undefined,
+      total_price: product?.selling_price || 0,
+    }));
+  };
+
+  const handleVariantChange = (value: string) => {
+    const variantId = parseInt(value);
+    setSelectedVariantId(variantId);
+    setFormData(prev => ({
+      ...prev,
+      variant_id: variantId,
     }));
   };
 
@@ -61,7 +77,7 @@ export default function SaleModal({ isOpen, onClose, onSuccess }: SaleModalProps
     setFormData(prev => ({
       ...prev,
       [name]: name.includes('quantity') || name.includes('price') 
-        ? parseFloat(value) || 0 
+        ? (value === '' ? 0 : parseFloat(value) || 0)
         : value,
     }));
   };
@@ -81,21 +97,35 @@ export default function SaleModal({ isOpen, onClose, onSuccess }: SaleModalProps
       return;
     }
 
+    if (selectedProduct.variants && selectedProduct.variants.length > 0 && !selectedVariantId) {
+      alert(t('pleaseSelectColor'));
+      return;
+    }
+
     if (formData.quantity_sold <= 0) {
       alert(t('quantityMustBeGreaterThanZero'));
+      return;
+    }
+
+    // Check stock availability
+    const availableStock = selectedVariantId 
+      ? (selectedProduct.variants?.find(v => v.id === selectedVariantId)?.stock_quantity || 0)
+      : selectedProduct.stock_quantity;
+    
+    if (formData.quantity_sold > availableStock) {
+      alert(`${t('insufficientStock')}. ${t('availableStock')}: ${availableStock}`);
       return;
     }
 
     setLoading(true);
 
     try {
-      const totalAmount = formData.quantity_sold * formData.selling_price;
-      
       await actions.addSale({
         product_id: formData.product_id,
+        variant_id: formData.variant_id,
         quantity_sold: formData.quantity_sold,
-        selling_price: formData.selling_price,
-        total_amount: totalAmount,
+        selling_price: pricePerUnit,
+        total_amount: formData.total_price,
         profit_amount: 0, // Calculated in server action
         sale_date: new Date(formData.sale_date).toISOString(),
       });
@@ -103,12 +133,14 @@ export default function SaleModal({ isOpen, onClose, onSuccess }: SaleModalProps
       onSuccess();
       setFormData({
         product_id: 0,
+        variant_id: undefined,
         quantity_sold: 1,
-        selling_price: 0,
+        total_price: 0,
         sale_date: new Date().toISOString().split('T')[0],
         notes: '',
       });
       setSelectedProduct(null);
+      setSelectedVariantId(null);
     } catch (error) {
       console.error('Error creating sale:', error);
       alert(error instanceof Error ? error.message : t('failedToCreateSale'));
@@ -146,7 +178,16 @@ export default function SaleModal({ isOpen, onClose, onSuccess }: SaleModalProps
                       <div className="h-[22px] w-[22px] rounded bg-muted" />
                     )}
                     <div className="flex flex-col leading-tight">
-                      <span className="text-sm font-medium">{selectedProduct.name}</span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-sm font-medium">{selectedProduct.name}</span>
+                        {selectedProduct.color && (
+                          <div 
+                            className="h-3 w-3 rounded-full border border-gray-300" 
+                            style={{ backgroundColor: selectedProduct.color }}
+                            title={selectedProduct.color}
+                          />
+                        )}
+                      </div>
                       <span className="text-xs text-muted-foreground">{t('stock')}: {selectedProduct.stock_quantity}</span>
                     </div>
                   </div>
@@ -170,8 +211,19 @@ export default function SaleModal({ isOpen, onClose, onSuccess }: SaleModalProps
                         <div className="h-[22px] w-[22px] rounded bg-muted" />
                       )}
                       <div className="flex flex-col leading-tight">
-                        <span className="text-sm font-medium">{product.name}</span>
-                        <span className="text-xs text-muted-foreground">{t('stock')}: {product.stock_quantity}</span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-sm font-medium">{product.name}</span>
+                          {product.color && (
+                            <div 
+                              className="h-3 w-3 rounded-full border border-gray-300" 
+                              style={{ backgroundColor: product.color }}
+                              title={product.color}
+                            />
+                          )}
+                        </div>
+                        <span className="text-xs text-muted-foreground">
+                          {t('stock')}: {product.stock_quantity} | {t('sku')}: {product.sku}
+                        </span>
                       </div>
                     </div>
                   </SelectItem>
@@ -180,7 +232,40 @@ export default function SaleModal({ isOpen, onClose, onSuccess }: SaleModalProps
             </Select>
           </div>
 
-          {selectedProduct && (
+          {selectedProduct && selectedProduct.variants && selectedProduct.variants.length > 0 && (
+            <div>
+              <Label htmlFor="variant">{t('selectColor')}</Label>
+              <Select value={selectedVariantId?.toString() || ''} onValueChange={handleVariantChange}>
+                <SelectTrigger>
+                  <SelectValue placeholder={t('selectColor')} />
+                </SelectTrigger>
+                <SelectContent>
+                  {selectedProduct.variants.map(variant => (
+                    <SelectItem key={variant.id} value={variant.id.toString()}>
+                      <div className="flex items-center gap-2">
+                        <div 
+                          className="h-4 w-4 rounded-full border border-gray-300" 
+                          style={{ backgroundColor: variant.color }}
+                        />
+                        <span>{variant.color}</span>
+                        <span className="text-xs text-muted-foreground">({t('stock')}: {variant.stock_quantity})</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          {selectedProduct && selectedVariantId && (
+            <div className="rounded-lg bg-muted p-3 text-sm">
+              <p className="text-muted-foreground">
+                {t('availableStock')}: <span className="font-semibold text-foreground">{selectedProduct.variants?.find(v => v.id === selectedVariantId)?.stock_quantity || 0}</span>
+              </p>
+            </div>
+          )}
+
+          {selectedProduct && (!selectedProduct.variants || selectedProduct.variants.length === 0) && (
             <div className="rounded-lg bg-muted p-3 text-sm">
               <p className="text-muted-foreground">
                 {t('availableStock')}: <span className="font-semibold text-foreground">{selectedProduct.stock_quantity}</span>
@@ -197,59 +282,41 @@ export default function SaleModal({ isOpen, onClose, onSuccess }: SaleModalProps
                 type="number"
                 value={formData.quantity_sold}
                 onChange={handleChange}
-                min="1"
-                max={selectedProduct?.stock_quantity || 0}
+                min="0.01"
+                step="0.01"
               />
             </div>
 
             <div>
-              <Label htmlFor="selling_price">{t('sellingPrice')}</Label>
+              <Label htmlFor="total_price">{t('totalPrice')}</Label>
               <Input
-                id="selling_price"
-                name="selling_price"
+                id="total_price"
+                name="total_price"
                 type="number"
                 step="0.01"
-                value={formData.selling_price}
+                value={formData.total_price}
                 onChange={handleChange}
-                min="0"
+                required
               />
             </div>
           </div>
 
-          <div>
-            <Label htmlFor="sale_date">{t('saleDate')}</Label>
-            <Input
-              id="sale_date"
-              name="sale_date"
-              type="date"
-              value={formData.sale_date}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="notes">{t('notes')}</Label>
-            <textarea
-              id="notes"
-              value={formData.notes}
-              onChange={handleNotesChange}
-              placeholder={t('saleNotesPlaceholder')}
-              className="w-full h-16 px-3 py-2 border border-input rounded-md bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-            />
-          </div>
-
-          {selectedProduct && formData.selling_price > 0 && (
-            <div className="rounded-lg bg-blue-50 p-3">
-              <p className="text-sm text-blue-900">
-                {t('totalAmount')}: <span className="font-semibold">{displayPrice(formData.quantity_sold * formData.selling_price, language)}</span>
-              </p>
-              <p className="text-sm text-blue-900">
-                {t('expectedProfit')}: <span className="font-semibold text-green-600">
-                  {displayPrice((formData.selling_price - selectedProduct.cost_price) * formData.quantity_sold, language)}
-                </span>
-              </p>
+          <div className="rounded-lg bg-primary/10 p-3 text-sm space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="text-muted-foreground">{t('pricePerUnit')}:</span>
+              <span className="font-semibold text-lg">
+                {pricePerUnit.toFixed(2)} MAD / {selectedProduct?.measurement_unit === 'm' ? t('meter') : t('piece')}
+              </span>
             </div>
-          )}
+            {selectedProduct && (
+              <div className="flex justify-between items-center pt-2 border-t border-primary/20">
+                <span className="text-muted-foreground">{t('expectedProfit')}:</span>
+                <span className="font-semibold text-green-600">
+                  {((pricePerUnit - selectedProduct.cost_price) * formData.quantity_sold).toFixed(2)} MAD
+                </span>
+              </div>
+            )}
+          </div>
 
           <div className="flex gap-3 justify-end pt-4">
             <Button variant="outline" onClick={onClose}>
