@@ -122,11 +122,17 @@ export async function getSales(): Promise<Sale[]> {
   const supabase = getSupabaseAdmin();
   const { data, error } = await supabase
     .from('sales')
-    .select('*')
+    .select('*, products(name, sku)')
     .order('sale_date', { ascending: false });
 
   if (error) throw new Error(error.message);
-  return (data ?? []) as Sale[];
+
+  return (data ?? []).map((sale: any) => ({
+    ...sale,
+    product_name: sale.products?.name || '',
+    product_sku: sale.products?.sku || '',
+    products: undefined,
+  })) as Sale[];
 }
 
 export async function getSale(id: number): Promise<Sale | undefined> {
