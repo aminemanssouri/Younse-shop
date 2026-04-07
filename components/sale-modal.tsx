@@ -183,7 +183,7 @@ export default function SaleModal({ isOpen, onClose, onSuccess }: SaleModalProps
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
           <div>
             <Label htmlFor="sale_date">{t('saleDate')}</Label>
             <Input
