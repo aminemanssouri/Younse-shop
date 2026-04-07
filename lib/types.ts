@@ -32,6 +32,9 @@ export interface Sale {
   total_amount: number;
   profit_amount: number;
   sale_date: string;
+  status: 'completed' | 'pending'; // completed = fully paid, pending = partial payment
+  amount_paid: number; // how much the customer actually paid
+  remaining_debt: number; // total_amount - amount_paid
   notes?: string;
   created_at: string;
 }

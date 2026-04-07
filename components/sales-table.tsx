@@ -7,6 +7,7 @@ import { DetailsDialog } from '@/components/details-dialog';
 import { useState } from 'react';
 import { useLanguage } from '@/contexts/language-context';
 import { displayPrice } from '@/lib/currency';
+import { cn } from '@/lib/utils';
 import * as actions from '@/app/actions';
 
 interface SalesTableProps {
@@ -58,18 +59,19 @@ export default function SalesTable({ sales, onRefresh }: SalesTableProps) {
           <tr className="border-b border-border">
             <th className="px-4 py-3 text-left font-semibold text-foreground">{t('product')}</th>
             <th className="px-4 py-3 text-right font-semibold text-foreground">{t('quantity')}</th>
-            <th className="px-4 py-3 text-right font-semibold text-foreground">{t('unitPrice')}</th>
             <th className="px-4 py-3 text-right font-semibold text-foreground">{t('totalPrice')}</th>
+            <th className="px-4 py-3 text-center font-semibold text-foreground">{t('saleStatus')}</th>
+            <th className="px-4 py-3 text-right font-semibold text-foreground">{t('amountPaid')}</th>
+            <th className="px-4 py-3 text-right font-semibold text-foreground">{t('remainingDebt')}</th>
             <th className="px-4 py-3 text-right font-semibold text-foreground">{t('profit')}</th>
             <th className="px-4 py-3 text-left font-semibold text-foreground">{t('saleDate')}</th>
-            <th className="px-4 py-3 text-center font-semibold text-foreground">{t('view')}</th>
-            <th className="px-4 py-3 text-center font-semibold text-foreground">{t('cancelSale')}</th>
+            <th className="px-4 py-3 text-center font-semibold text-foreground">{t('actions')}</th>
           </tr>
         </thead>
         <tbody>
           {sales.length === 0 ? (
             <tr>
-              <td colSpan={8} className="px-4 py-8 text-center text-muted-foreground">
+              <td colSpan={9} className="px-4 py-8 text-center text-muted-foreground">
                 {t('noSalesRecords')}
               </td>
             </tr>
@@ -83,14 +85,33 @@ export default function SalesTable({ sales, onRefresh }: SalesTableProps) {
                   </div>
                 </td>
                 <td className="px-4 py-3 text-right text-foreground">{sale.quantity_sold}</td>
-                <td className="px-4 py-3 text-right text-muted-foreground">
-                  {displayPrice(sale.selling_price, language)}
-                </td>
                 <td className="px-4 py-3 text-right font-semibold text-foreground">
                   {displayPrice(sale.total_amount, language)}
                 </td>
+                <td className="px-4 py-3 text-center">
+                  <span className={cn(
+                    "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium",
+                    (sale.status || 'completed') === 'completed'
+                      ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                      : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
+                  )}>
+                    {(sale.status || 'completed') === 'completed' ? t('saleCompleted') : t('salePending')}
+                  </span>
+                </td>
+                <td className="px-4 py-3 text-right text-foreground">
+                  {displayPrice(sale.amount_paid ?? sale.total_amount, language)}
+                </td>
                 <td className="px-4 py-3 text-right">
-                  <span className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium bg-green-100 text-green-800">
+                  {(sale.remaining_debt ?? 0) > 0 ? (
+                    <span className="font-semibold text-red-600 dark:text-red-400">
+                      {displayPrice(sale.remaining_debt, language)}
+                    </span>
+                  ) : (
+                    <span className="text-muted-foreground">—</span>
+                  )}
+                </td>
+                <td className="px-4 py-3 text-right">
+                  <span className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
                     {displayPrice(sale.profit_amount, language)}
                   </span>
                 </td>
@@ -98,25 +119,25 @@ export default function SalesTable({ sales, onRefresh }: SalesTableProps) {
                   {formatDate(sale.sale_date)}
                 </td>
                 <td className="px-4 py-3 text-center">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleView(sale)}
-                    title={t('view')}
-                  >
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                </td>
-                <td className="px-4 py-3 text-center">
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => handleCancelSale(sale)}
-                    disabled={cancelingId === sale.id}
-                    title={t('cancelSale')}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
+                  <div className="flex items-center justify-center gap-1">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleView(sale)}
+                      title={t('view')}
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleCancelSale(sale)}
+                      disabled={cancelingId === sale.id}
+                      title={t('cancelSale')}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </td>
               </tr>
             ))
@@ -155,6 +176,29 @@ export default function SalesTable({ sales, onRefresh }: SalesTableProps) {
               <p className="text-muted-foreground">{t('saleDate')}</p>
               <p className="font-medium">{formatDate(selectedSale.sale_date)}</p>
             </div>
+            <div>
+              <p className="text-muted-foreground">{t('saleStatus')}</p>
+              <p className="font-medium">
+                <span className={cn(
+                  "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium",
+                  (selectedSale.status || 'completed') === 'completed'
+                    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                    : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
+                )}>
+                  {(selectedSale.status || 'completed') === 'completed' ? t('saleCompleted') : t('salePending')}
+                </span>
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">{t('amountPaid')}</p>
+              <p className="font-medium">{displayPrice(selectedSale.amount_paid ?? selectedSale.total_amount, language)}</p>
+            </div>
+            {(selectedSale.remaining_debt ?? 0) > 0 && (
+              <div>
+                <p className="text-muted-foreground">{t('remainingDebt')}</p>
+                <p className="font-semibold text-red-600 dark:text-red-400">{displayPrice(selectedSale.remaining_debt, language)}</p>
+              </div>
+            )}
             {selectedSale.notes && (
               <div className="col-span-2">
                 <p className="text-muted-foreground">{t('notes')}</p>

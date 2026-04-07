@@ -35,11 +35,15 @@ export default function SaleModal({ isOpen, onClose, onSuccess }: SaleModalProps
     quantity_sold: 1,
     total_price: 0,
     sale_date: new Date().toISOString().split('T')[0],
+    status: 'completed' as 'completed' | 'pending',
+    amount_paid: 0,
     notes: '',
   });
 
   // Calculate price per unit from total price
   const pricePerUnit = formData.quantity_sold > 0 ? formData.total_price / formData.quantity_sold : 0;
+  // Calculate remaining debt
+  const remainingDebt = formData.status === 'pending' ? Math.max(0, formData.total_price - formData.amount_paid) : 0;
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -81,9 +85,18 @@ export default function SaleModal({ isOpen, onClose, onSuccess }: SaleModalProps
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name.includes('quantity') || name.includes('price') 
+      [name]: name.includes('quantity') || name.includes('price') || name === 'amount_paid'
         ? (value === '' ? 0 : parseFloat(value) || 0)
         : value,
+    }));
+  };
+
+  const handleStatusChange = (value: string) => {
+    const status = value as 'completed' | 'pending';
+    setFormData(prev => ({
+      ...prev,
+      status,
+      amount_paid: status === 'completed' ? prev.total_price : prev.amount_paid,
     }));
   };
 
@@ -125,6 +138,7 @@ export default function SaleModal({ isOpen, onClose, onSuccess }: SaleModalProps
     setLoading(true);
 
     try {
+      const amountPaid = formData.status === 'completed' ? formData.total_price : formData.amount_paid;
       await actions.addSale({
         product_id: formData.product_id,
         variant_id: formData.variant_id,
@@ -133,6 +147,9 @@ export default function SaleModal({ isOpen, onClose, onSuccess }: SaleModalProps
         total_amount: formData.total_price,
         profit_amount: 0, // Calculated in server action
         sale_date: new Date(formData.sale_date).toISOString(),
+        status: formData.status,
+        amount_paid: amountPaid,
+        remaining_debt: formData.total_price - amountPaid,
       });
 
       onSuccess();
@@ -142,6 +159,8 @@ export default function SaleModal({ isOpen, onClose, onSuccess }: SaleModalProps
         quantity_sold: 1,
         total_price: 0,
         sale_date: new Date().toISOString().split('T')[0],
+        status: 'completed',
+        amount_paid: 0,
         notes: '',
       });
       setSelectedProduct(null);
@@ -363,6 +382,46 @@ export default function SaleModal({ isOpen, onClose, onSuccess }: SaleModalProps
               </div>
             )}
           </div>
+
+          <div>
+            <Label>{t('saleStatus')}</Label>
+            <Select value={formData.status} onValueChange={handleStatusChange}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="completed">{t('saleCompleted')}</SelectItem>
+                <SelectItem value="pending">{t('salePending')}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {formData.status === 'pending' && (
+            <div className="space-y-3">
+              <div>
+                <Label htmlFor="amount_paid">{t('amountPaid')}</Label>
+                <Input
+                  id="amount_paid"
+                  name="amount_paid"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  max={formData.total_price}
+                  value={formData.amount_paid}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 p-3 text-sm">
+                <div className="flex justify-between items-center">
+                  <span className="text-red-700 dark:text-red-400 font-medium">{t('remainingDebt')}:</span>
+                  <span className="font-bold text-lg text-red-600 dark:text-red-400">
+                    {remainingDebt.toFixed(2)} MAD
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="flex gap-3 justify-end pt-4">
             <Button variant="outline" onClick={onClose}>
