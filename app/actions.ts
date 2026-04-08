@@ -1,6 +1,6 @@
 'use server';
 
-import { Product, ProductVariant, Sale, CustomerDebt, SupplierDebt } from '@/lib/types';
+import { Product, ProductVariant, Sale, CustomerDebt, SupplierDebt, Charge } from '@/lib/types';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
 
 // PRODUCT VARIANTS ACTIONS
@@ -413,11 +413,17 @@ export async function getDailySalesReportByDate(dateStr: string): Promise<{
     amount_paid: number;
     remaining_debt: number;
   }>;
+  charges: Array<{
+    name: string;
+    amount: number;
+  }>;
   totalRevenue: number;
   totalProfit: number;
   totalCost: number;
+  totalCharges: number;
+  netProfit: number;
 }> {
-  const [products, sales] = await Promise.all([getProducts(), getSales()]);
+  const [products, sales, allCharges] = await Promise.all([getProducts(), getSales(), getCharges()]);
 
   // Parse dateStr (YYYY-MM-DD) as UTC to avoid timezone issues
   const [year, month, day] = dateStr.split('-').map(Number);
@@ -431,6 +437,16 @@ export async function getDailySalesReportByDate(dateStr: string): Promise<{
       saleDate.getFullYear() === targetYear &&
       saleDate.getMonth() === targetMonth &&
       saleDate.getDate() === targetDay
+    );
+  });
+
+  // Filter charges for the target date
+  const dayCharges = allCharges.filter((charge: Charge) => {
+    const chargeDate = new Date(charge.charge_date);
+    return (
+      chargeDate.getFullYear() === targetYear &&
+      chargeDate.getMonth() === targetMonth &&
+      chargeDate.getDate() === targetDay
     );
   });
 
@@ -454,13 +470,23 @@ export async function getDailySalesReportByDate(dateStr: string): Promise<{
   const totalRevenue = daySales.reduce((sum, sale) => sum + (sale.total_amount || 0), 0);
   const totalProfit = daySales.reduce((sum, sale) => sum + (sale.profit_amount || 0), 0);
   const totalCost = totalRevenue - totalProfit;
+  const totalCharges = dayCharges.reduce((sum, charge) => sum + (charge.amount || 0), 0);
+  const netProfit = totalProfit - totalCharges;
+
+  const chargesWithDetails = dayCharges.map(charge => ({
+    name: charge.name,
+    amount: charge.amount,
+  }));
 
   return {
     date: dateStr,
     sales: salesWithDetails,
+    charges: chargesWithDetails,
     totalRevenue,
     totalProfit,
     totalCost,
+    totalCharges,
+    netProfit,
   };
 }
 
@@ -490,5 +516,35 @@ export async function updateNote(id: number, content: string) {
 export async function deleteNote(id: number) {
   const supabase = getSupabaseAdmin();
   const { error } = await supabase.from('notes').delete().eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+// CHARGES ACTIONS
+export async function getCharges(): Promise<Charge[]> {
+  const supabase = getSupabaseAdmin();
+  const { data, error } = await supabase
+    .from('charges')
+    .select('*')
+    .order('charge_date', { ascending: false });
+
+  if (error) throw new Error(error.message);
+  return (data ?? []) as Charge[];
+}
+
+export async function addCharge(data: Omit<Charge, 'id' | 'created_at'>): Promise<void> {
+  const supabase = getSupabaseAdmin();
+  const { error } = await supabase.from('charges').insert(data);
+  if (error) throw new Error(error.message);
+}
+
+export async function updateCharge(id: number, data: Partial<Omit<Charge, 'id' | 'created_at'>>): Promise<void> {
+  const supabase = getSupabaseAdmin();
+  const { error } = await supabase.from('charges').update(data).eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+export async function deleteCharge(id: number): Promise<void> {
+  const supabase = getSupabaseAdmin();
+  const { error } = await supabase.from('charges').delete().eq('id', id);
   if (error) throw new Error(error.message);
 }

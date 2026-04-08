@@ -87,3 +87,12 @@ export interface SalesChartData {
   sales: number;
   profit: number;
 }
+
+export interface Charge {
+  id: number;
+  name: string;
+  amount: number;
+  charge_date: string;
+  notes?: string;
+  created_at: string;
+}

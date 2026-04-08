@@ -127,6 +127,26 @@ export default function DashboardPage() {
             </tbody>
           </table>
 
+          ${report.charges.length > 0 ? `
+          <h2 style="margin-top: 30px; font-size: 18px;">${t('charges')}</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>${t('chargeName')}</th>
+                <th>${t('chargeAmount')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${report.charges.map(charge => `
+                <tr>
+                  <td>${charge.name}</td>
+                  <td style="color: #dc2626;">${formatCurrency(charge.amount)}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          ` : ''}
+
           <div class="summary">
             <div class="summary-item">
               <span>${t('totalRevenue')}:</span>
@@ -136,10 +156,25 @@ export default function DashboardPage() {
               <span>${t('totalCost')}:</span>
               <strong>${formatCurrency(report.totalCost)}</strong>
             </div>
+            <div class="summary-item">
+              <span>${t('totalProfit')}:</span>
+              <strong>${formatCurrency(report.totalProfit)}</strong>
+            </div>
+            ${report.totalCharges > 0 ? `
+            <div class="summary-item" style="color: #dc2626;">
+              <span>${t('totalCharges')}:</span>
+              <strong>-${formatCurrency(report.totalCharges)}</strong>
+            </div>
+            <div class="summary-item total" style="border-top: 2px solid #333; padding-top: 10px;">
+              <span>Net Profit:</span>
+              <strong>${formatCurrency(report.netProfit)}</strong>
+            </div>
+            ` : `
             <div class="summary-item total">
               <span>${t('totalProfit')}:</span>
               <strong>${formatCurrency(report.totalProfit)}</strong>
             </div>
+            `}
           </div>
         </body>
         </html>
