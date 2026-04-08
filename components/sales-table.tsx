@@ -2,7 +2,8 @@
 
 import { Sale } from '@/lib/types';
 import { Button } from '@/components/ui/button';
-import { Eye, X } from 'lucide-react';
+import { Eye, X, Pencil } from 'lucide-react';
+import EditSaleModal from './edit-sale-modal';
 import { DetailsDialog } from '@/components/details-dialog';
 import { useState } from 'react';
 import { useLanguage } from '@/contexts/language-context';
@@ -18,6 +19,7 @@ interface SalesTableProps {
 export default function SalesTable({ sales, onRefresh }: SalesTableProps) {
   const { t, language } = useLanguage();
   const [isViewOpen, setIsViewOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedSale, setSelectedSale] = useState<Sale | null>(null);
   const [cancelingId, setCancelingId] = useState<number | null>(null);
 
@@ -35,6 +37,11 @@ export default function SalesTable({ sales, onRefresh }: SalesTableProps) {
   const handleView = (sale: Sale) => {
     setSelectedSale(sale);
     setIsViewOpen(true);
+  };
+
+  const handleEdit = (sale: Sale) => {
+    setSelectedSale(sale);
+    setIsEditOpen(true);
   };
 
   const handleCancelSale = async (sale: Sale) => {
@@ -129,6 +136,14 @@ export default function SalesTable({ sales, onRefresh }: SalesTableProps) {
                       <Eye className="h-4 w-4" />
                     </Button>
                     <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEdit(sale)}
+                      title={t('edit')}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
                       variant="destructive"
                       size="sm"
                       onClick={() => handleCancelSale(sale)}
@@ -144,6 +159,13 @@ export default function SalesTable({ sales, onRefresh }: SalesTableProps) {
           )}
         </tbody>
       </table>
+
+      <EditSaleModal
+        sale={selectedSale}
+        isOpen={isEditOpen}
+        onClose={() => setIsEditOpen(false)}
+        onSuccess={onRefresh}
+      />
 
       <DetailsDialog
         isOpen={isViewOpen}

@@ -210,6 +210,40 @@ export async function deleteSale(id: number): Promise<void> {
   if (error) throw new Error(error.message);
 }
 
+export async function updateSale(
+  id: number,
+  data: Partial<Pick<Sale, 'status' | 'amount_paid' | 'notes'>>
+): Promise<void> {
+  const sale = await getSale(id);
+  if (!sale) throw new Error('Sale not found');
+
+  const supabase = getSupabaseAdmin();
+
+  // Calculate remaining debt based on new amount_paid
+  let amountPaid = data.amount_paid ?? sale.amount_paid;
+  let remainingDebt = sale.total_amount - amountPaid;
+  let status = data.status ?? sale.status;
+
+  // Auto-update status if fully paid
+  if (amountPaid >= sale.total_amount) {
+    amountPaid = sale.total_amount;
+    remainingDebt = 0;
+    status = 'completed';
+  }
+
+  const { error } = await supabase
+    .from('sales')
+    .update({
+      status,
+      amount_paid: amountPaid,
+      remaining_debt: remainingDebt,
+      notes: data.notes ?? sale.notes,
+    })
+    .eq('id', id);
+
+  if (error) throw new Error(error.message);
+}
+
 export async function cancelSale(id: number): Promise<void> {
   const sale = await getSale(id);
   if (!sale) throw new Error('Sale not found');
@@ -375,6 +409,9 @@ export async function getDailySalesReportByDate(dateStr: string): Promise<{
     selling_price: number;
     total_amount: number;
     profit_amount: number;
+    status: 'completed' | 'pending';
+    amount_paid: number;
+    remaining_debt: number;
   }>;
   totalRevenue: number;
   totalProfit: number;
@@ -382,10 +419,11 @@ export async function getDailySalesReportByDate(dateStr: string): Promise<{
 }> {
   const [products, sales] = await Promise.all([getProducts(), getSales()]);
 
-  const targetDate = new Date(dateStr);
-  const targetYear = targetDate.getFullYear();
-  const targetMonth = targetDate.getMonth();
-  const targetDay = targetDate.getDate();
+  // Parse dateStr (YYYY-MM-DD) as UTC to avoid timezone issues
+  const [year, month, day] = dateStr.split('-').map(Number);
+  const targetYear = year;
+  const targetMonth = month - 1; // JS months are 0-indexed
+  const targetDay = day;
 
   const daySales = sales.filter(sale => {
     const saleDate = new Date(sale.sale_date);
@@ -400,12 +438,16 @@ export async function getDailySalesReportByDate(dateStr: string): Promise<{
 
   const salesWithDetails = daySales.map(sale => {
     const product = productsMap.get(sale.product_id);
+    const amountPaid = sale.amount_paid ?? sale.total_amount ?? 0;
     return {
       product_name: product?.name || `Product ${sale.product_id}`,
-      quantity_sold: sale.quantity_sold,
-      selling_price: sale.selling_price,
-      total_amount: sale.total_amount,
-      profit_amount: sale.profit_amount,
+      quantity_sold: sale.quantity_sold ?? 0,
+      selling_price: sale.selling_price ?? 0,
+      total_amount: sale.total_amount ?? 0,
+      profit_amount: sale.profit_amount ?? 0,
+      status: (sale.status || 'completed') as 'completed' | 'pending',
+      amount_paid: amountPaid,
+      remaining_debt: sale.remaining_debt ?? ((sale.total_amount - amountPaid) || 0),
     };
   });
 

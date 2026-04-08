@@ -46,16 +46,18 @@ export default function DashboardPage() {
   }, [refetchStats, refetchSales]);
 
   const downloadReportForDate = async (dateStr: string) => {
+    // Open window IMMEDIATELY (before any async) to avoid popup blocker
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      alert(t('downloadFailed') + ': Popup blocked. Please allow popups for this site.');
+      return;
+    }
+    
     setDownloading(true);
     try {
       const { getDailySalesReportByDate } = await import('@/app/actions');
       const report = await getDailySalesReportByDate(dateStr);
-      
-      const printWindow = window.open('', '_blank');
-      if (!printWindow) {
-        alert(t('downloadFailed'));
-        return;
-      }
+      console.log('Report data:', report);
 
       const locale = language === 'ar' ? 'ar-MA' : language === 'fr' ? 'fr-FR' : 'en-US';
       const formattedDate = new Date(report.date).toLocaleDateString(locale, {
@@ -104,6 +106,9 @@ export default function DashboardPage() {
                 <th>${t('unitPrice')}</th>
                 <th>${t('totalAmount')}</th>
                 <th>${t('profit')}</th>
+                <th>${t('saleStatus')}</th>
+                <th>${t('amountPaid')}</th>
+                <th>${t('remainingDebt')}</th>
               </tr>
             </thead>
             <tbody>
@@ -114,6 +119,9 @@ export default function DashboardPage() {
                   <td>${formatCurrency(sale.selling_price)}</td>
                   <td>${formatCurrency(sale.total_amount)}</td>
                   <td>${formatCurrency(sale.profit_amount)}</td>
+                  <td>${sale.status === 'completed' ? t('saleCompleted') : t('salePending')}</td>
+                  <td>${formatCurrency(sale.amount_paid)}</td>
+                  <td style="${sale.remaining_debt > 0 ? 'color: #dc2626; font-weight: bold;' : ''}">${formatCurrency(sale.remaining_debt)}</td>
                 </tr>
               `).join('')}
             </tbody>
@@ -146,7 +154,7 @@ export default function DashboardPage() {
       }, 250);
     } catch (error) {
       console.error('PDF generation error:', error);
-      alert(t('downloadFailed'));
+      alert(t('downloadFailed') + ': ' + (error instanceof Error ? error.message : String(error)));
     } finally {
       setDownloading(false);
     }
