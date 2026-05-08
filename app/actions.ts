@@ -548,3 +548,159 @@ export async function deleteCharge(id: number): Promise<void> {
   const { error } = await supabase.from('charges').delete().eq('id', id);
   if (error) throw new Error(error.message);
 }
+
+// DATE RANGE SALES REPORT ACTIONS
+export async function getSalesReportByDateRange(startDate: string, endDate: string): Promise<{
+  startDate: string;
+  endDate: string;
+  sales: Array<{
+    product_name: string;
+    quantity_sold: number;
+    selling_price: number;
+    total_amount: number;
+    profit_amount: number;
+    status: 'completed' | 'pending';
+    amount_paid: number;
+    remaining_debt: number;
+    sale_date: string;
+  }>;
+  charges: Array<{
+    name: string;
+    amount: number;
+    charge_date: string;
+  }>;
+  totalRevenue: number;
+  totalProfit: number;
+  totalCost: number;
+  totalCharges: number;
+  netProfit: number;
+  dayBreakdown: Array<{
+    date: string;
+    revenue: number;
+    profit: number;
+    salesCount: number;
+  }>;
+}> {
+  const [products, sales, allCharges] = await Promise.all([getProducts(), getSales(), getCharges()]);
+
+  // Parse dates as UTC to avoid timezone issues
+  const start = new Date(startDate + 'T00:00:00.000Z');
+  const end = new Date(endDate + 'T23:59:59.999Z');
+
+  // Filter sales within date range
+  const rangeSales = sales.filter(sale => {
+    const saleDate = new Date(sale.sale_date);
+    return saleDate >= start && saleDate <= end;
+  });
+
+  // Filter charges within date range
+  const rangeCharges = allCharges.filter((charge: Charge) => {
+    const chargeDate = new Date(charge.charge_date);
+    return chargeDate >= start && chargeDate <= end;
+  });
+
+  const productsMap = new Map(products.map(p => [p.id, p]));
+
+  const salesWithDetails = rangeSales.map(sale => {
+    const product = productsMap.get(sale.product_id);
+    const amountPaid = sale.amount_paid ?? sale.total_amount ?? 0;
+    return {
+      product_name: product?.name || `Product ${sale.product_id}`,
+      quantity_sold: sale.quantity_sold ?? 0,
+      selling_price: sale.selling_price ?? 0,
+      total_amount: sale.total_amount ?? 0,
+      profit_amount: sale.profit_amount ?? 0,
+      status: (sale.status || 'completed') as 'completed' | 'pending',
+      amount_paid: amountPaid,
+      remaining_debt: sale.remaining_debt ?? ((sale.total_amount - amountPaid) || 0),
+      sale_date: sale.sale_date,
+    };
+  });
+
+  // Calculate daily breakdown
+  const dayBreakdownMap = new Map<string, { revenue: number; profit: number; salesCount: number }>();
+  
+  rangeSales.forEach(sale => {
+    const dateKey = new Date(sale.sale_date).toISOString().split('T')[0];
+    const existing = dayBreakdownMap.get(dateKey) || { revenue: 0, profit: 0, salesCount: 0 };
+    dayBreakdownMap.set(dateKey, {
+      revenue: existing.revenue + (sale.total_amount || 0),
+      profit: existing.profit + (sale.profit_amount || 0),
+      salesCount: existing.salesCount + 1,
+    });
+  });
+
+  const dayBreakdown = Array.from(dayBreakdownMap.entries())
+    .map(([date, data]) => ({ date, ...data }))
+    .sort((a, b) => a.date.localeCompare(b.date));
+
+  const totalRevenue = rangeSales.reduce((sum, sale) => sum + (sale.total_amount || 0), 0);
+  const totalProfit = rangeSales.reduce((sum, sale) => sum + (sale.profit_amount || 0), 0);
+  const totalCost = totalRevenue - totalProfit;
+  const totalCharges = rangeCharges.reduce((sum, charge) => sum + (charge.amount || 0), 0);
+  const netProfit = totalProfit - totalCharges;
+
+  const chargesWithDetails = rangeCharges.map(charge => ({
+    name: charge.name,
+    amount: charge.amount,
+    charge_date: charge.charge_date,
+  }));
+
+  return {
+    startDate,
+    endDate,
+    sales: salesWithDetails,
+    charges: chargesWithDetails,
+    totalRevenue,
+    totalProfit,
+    totalCost,
+    totalCharges,
+    netProfit,
+    dayBreakdown,
+  };
+}
+
+// Helper function to get common date ranges
+export async function getCommonDateRanges() {
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  
+  const last7Days = new Date(today);
+  last7Days.setDate(last7Days.getDate() - 7);
+  
+  const last10Days = new Date(today);
+  last10Days.setDate(last10Days.getDate() - 10);
+  
+  const last30Days = new Date(today);
+  last30Days.setDate(last30Days.getDate() - 30);
+  
+  const thisMonthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+  const lastMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+  const lastMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0);
+
+  return {
+    today: today.toISOString().split('T')[0],
+    yesterday: yesterday.toISOString().split('T')[0],
+    last7Days: {
+      start: last7Days.toISOString().split('T')[0],
+      end: today.toISOString().split('T')[0],
+    },
+    last10Days: {
+      start: last10Days.toISOString().split('T')[0],
+      end: today.toISOString().split('T')[0],
+    },
+    last30Days: {
+      start: last30Days.toISOString().split('T')[0],
+      end: today.toISOString().split('T')[0],
+    },
+    thisMonth: {
+      start: thisMonthStart.toISOString().split('T')[0],
+      end: today.toISOString().split('T')[0],
+    },
+    lastMonth: {
+      start: lastMonthStart.toISOString().split('T')[0],
+      end: lastMonthEnd.toISOString().split('T')[0],
+    },
+  };
+}
