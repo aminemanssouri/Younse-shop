@@ -96,3 +96,14 @@ export interface Charge {
   notes?: string;
   created_at: string;
 }
+
+export interface ClientCheck {
+  id: number;
+  client_name: string;
+  check_date: string;
+  amount: number;
+  bank?: string | null;
+  check_number?: string | null;
+  notes?: string | null;
+  created_at: string;
+}

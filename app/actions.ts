@@ -1,6 +1,6 @@
 'use server';
 
-import { Product, ProductVariant, Sale, CustomerDebt, SupplierDebt, Charge } from '@/lib/types';
+import { Product, ProductVariant, Sale, CustomerDebt, SupplierDebt, Charge, ClientCheck } from '@/lib/types';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
 
 // PRODUCT VARIANTS ACTIONS
@@ -546,6 +546,36 @@ export async function updateCharge(id: number, data: Partial<Omit<Charge, 'id' |
 export async function deleteCharge(id: number): Promise<void> {
   const supabase = getSupabaseAdmin();
   const { error } = await supabase.from('charges').delete().eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+// CLIENT CHECKS — cheques handed over by clients
+export async function getClientChecks(): Promise<ClientCheck[]> {
+  const supabase = getSupabaseAdmin();
+  const { data, error } = await supabase
+    .from('client_checks')
+    .select('*')
+    .order('check_date', { ascending: false });
+
+  if (error) throw new Error(error.message);
+  return (data ?? []) as ClientCheck[];
+}
+
+export async function addClientCheck(data: Omit<ClientCheck, 'id' | 'created_at'>): Promise<void> {
+  const supabase = getSupabaseAdmin();
+  const { error } = await supabase.from('client_checks').insert(data);
+  if (error) throw new Error(error.message);
+}
+
+export async function updateClientCheck(id: number, data: Partial<Omit<ClientCheck, 'id' | 'created_at'>>): Promise<void> {
+  const supabase = getSupabaseAdmin();
+  const { error } = await supabase.from('client_checks').update(data).eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+export async function deleteClientCheck(id: number): Promise<void> {
+  const supabase = getSupabaseAdmin();
+  const { error } = await supabase.from('client_checks').delete().eq('id', id);
   if (error) throw new Error(error.message);
 }
 

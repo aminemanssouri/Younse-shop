@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BarChart3, Package, ShoppingCart, Users, DollarSign, Globe, Menu, Moon, Sun } from 'lucide-react';
+import { BarChart3, Package, ShoppingCart, Users, DollarSign, Globe, Menu, Moon, Sun, Banknote } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/language-context';
 import { Language } from '@/lib/translations';
@@ -42,6 +42,11 @@ export default function Navigation() {
       href: '/sales',
       label: t('sales'),
       icon: ShoppingCart,
+    },
+    {
+      href: '/checks',
+      label: t('checks'),
+      icon: Banknote,
     },
     {
       href: '/customer-debts',
