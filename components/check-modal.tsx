@@ -1,12 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ClientCheck } from '@/lib/types';
+import { CheckStatus, ClientCheck } from '@/lib/types';
 import * as actions from '@/app/actions';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useLanguage } from '@/contexts/language-context';
 
 interface CheckModalProps {
@@ -32,6 +33,7 @@ export default function CheckModal({ isOpen, onClose, onSuccess, check }: CheckM
     bank: '',
     check_number: '',
     notes: '',
+    status: 'pending' as CheckStatus,
   });
 
   useEffect(() => {
@@ -43,6 +45,7 @@ export default function CheckModal({ isOpen, onClose, onSuccess, check }: CheckM
         bank: check.bank || '',
         check_number: check.check_number || '',
         notes: check.notes || '',
+        status: check.status || 'pending',
       });
     } else {
       setFormData({
@@ -52,6 +55,7 @@ export default function CheckModal({ isOpen, onClose, onSuccess, check }: CheckM
         bank: '',
         check_number: '',
         notes: '',
+        status: 'pending',
       });
     }
   }, [check, isOpen]);
@@ -85,7 +89,7 @@ export default function CheckModal({ isOpen, onClose, onSuccess, check }: CheckM
     setLoading(true);
     try {
       if (isEditing && check) {
-        await actions.updateClientCheck(check.id, payload);
+        await actions.updateClientCheck(check.id, { ...payload, status: formData.status });
       } else {
         await actions.addClientCheck(payload);
       }
@@ -182,6 +186,25 @@ export default function CheckModal({ isOpen, onClose, onSuccess, check }: CheckM
               className="w-full h-20 px-3 py-2 border border-input rounded-md bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
+
+          {isEditing && (
+            <div>
+              <Label>{t('checkStatus')}</Label>
+              <Select
+                value={formData.status}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, status: value as CheckStatus }))}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pending">{t('checkPending')}</SelectItem>
+                  <SelectItem value="paid">{t('checkPaid')}</SelectItem>
+                  <SelectItem value="unpaid">{t('checkUnpaid')}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           <div className="flex gap-3 justify-end pt-4">
             <Button variant="outline" onClick={onClose} type="button">

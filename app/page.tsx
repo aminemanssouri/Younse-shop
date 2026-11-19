@@ -14,6 +14,7 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useLanguage } from '@/contexts/language-context';
+import { salesPdfDocument } from '@/lib/sales-pdf';
 
 export default function DashboardPage() {
   const { t, language } = useLanguage();
@@ -79,30 +80,12 @@ export default function DashboardPage() {
         }).format(amount).replace('MAD', 'DH');
       };
 
-      printWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <title>${t('dailySalesReport')} - ${formattedDate}</title>
-          <style>
-            * { margin: 0; padding: 0; box-sizing: border-box; }
-            body { font-family: Arial, sans-serif; padding: 20px; }
-            h1 { font-size: 24px; margin-bottom: 10px; }
-            .date { color: #666; margin-bottom: 20px; }
-            table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-            th { background-color: #f4f4f4; font-weight: bold; }
-            .summary { margin-top: 20px; }
-            .summary-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
-            .summary-item strong { font-weight: bold; }
-            .total { font-size: 18px; margin-top: 10px; padding-top: 10px; border-top: 2px solid #333; }
-            @media print { body { padding: 0; } }
-          </style>
-        </head>
-        <body>
-          <h1>${t('dailySalesReport')}</h1>
-          <div class="date">${formattedDate}</div>
-          
+      printWindow.document.write(salesPdfDocument({
+        title: `${t('dailySalesReport')} - ${formattedDate}`,
+        heading: t('dailySalesReport'),
+        subtitle: formattedDate,
+        dir: language === 'ar' ? 'rtl' : 'ltr',
+        body: `
           <table>
             <thead>
               <tr>
@@ -126,14 +109,14 @@ export default function DashboardPage() {
                   <td>${formatCurrency(sale.profit_amount)}</td>
                   <td>${sale.status === 'completed' ? t('saleCompleted') : t('salePending')}</td>
                   <td>${formatCurrency(sale.amount_paid)}</td>
-                  <td style="${sale.remaining_debt > 0 ? 'color: #dc2626; font-weight: bold;' : ''}">${formatCurrency(sale.remaining_debt)}</td>
+                  <td class="${sale.remaining_debt > 0 ? 'negative' : ''}">${formatCurrency(sale.remaining_debt)}</td>
                 </tr>
               `).join('')}
             </tbody>
           </table>
 
           ${report.charges.length > 0 ? `
-          <h2 style="margin-top: 30px; font-size: 18px;">${t('charges')}</h2>
+          <h2>${t('charges')}</h2>
           <table>
             <thead>
               <tr>
@@ -145,7 +128,7 @@ export default function DashboardPage() {
               ${report.charges.map(charge => `
                 <tr>
                   <td>${charge.name}</td>
-                  <td style="color: #dc2626;">${formatCurrency(charge.amount)}</td>
+                  <td class="negative">${formatCurrency(charge.amount)}</td>
                 </tr>
               `).join('')}
             </tbody>
@@ -166,11 +149,11 @@ export default function DashboardPage() {
               <strong>${formatCurrency(report.totalProfit)}</strong>
             </div>
             ${report.totalCharges > 0 ? `
-            <div class="summary-item" style="color: #dc2626;">
+            <div class="summary-item">
               <span>${t('totalCharges')}:</span>
-              <strong>-${formatCurrency(report.totalCharges)}</strong>
+              <strong class="negative">-${formatCurrency(report.totalCharges)}</strong>
             </div>
-            <div class="summary-item total" style="border-top: 2px solid #333; padding-top: 10px;">
+            <div class="summary-item total">
               <span>Net Profit:</span>
               <strong>${formatCurrency(report.netProfit)}</strong>
             </div>
@@ -181,9 +164,8 @@ export default function DashboardPage() {
             </div>
             `}
           </div>
-        </body>
-        </html>
-      `);
+        `,
+      }));
       
       printWindow.document.close();
       printWindow.focus();
@@ -244,32 +226,12 @@ export default function DashboardPage() {
         }).format(amount).replace('MAD', 'DH');
       };
 
-      printWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <title>${t('dateRangeReport')} - ${formattedStartDate} ${t('to')} ${formattedEndDate}</title>
-          <style>
-            * { margin: 0; padding: 0; box-sizing: border-box; }
-            body { font-family: Arial, sans-serif; padding: 20px; }
-            h1 { font-size: 24px; margin-bottom: 10px; }
-            .date-range { color: #666; margin-bottom: 20px; }
-            table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-            th { background-color: #f4f4f4; font-weight: bold; }
-            .summary { margin-top: 20px; }
-            .summary-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
-            .summary-item strong { font-weight: bold; }
-            .total { font-size: 18px; margin-top: 10px; padding-top: 10px; border-top: 2px solid #333; }
-            .daily-breakdown { margin-top: 30px; }
-            .daily-breakdown h2 { font-size: 18px; margin-bottom: 15px; }
-            @media print { body { padding: 0; } }
-          </style>
-        </head>
-        <body>
-          <h1>${t('dateRangeReport')}</h1>
-          <div class="date-range">${formattedStartDate} ${t('to')} ${formattedEndDate}</div>
-          
+      printWindow.document.write(salesPdfDocument({
+        title: `${t('dateRangeReport')} - ${formattedStartDate} ${t('to')} ${formattedEndDate}`,
+        heading: t('dateRangeReport'),
+        subtitle: `${formattedStartDate} ${t('to')} ${formattedEndDate}`,
+        dir: language === 'ar' ? 'rtl' : 'ltr',
+        body: `
           <table>
             <thead>
               <tr>
@@ -294,7 +256,7 @@ export default function DashboardPage() {
                   <td>${formatCurrency(sale.profit_amount)}</td>
                   <td>${sale.status === 'completed' ? t('saleCompleted') : t('salePending')}</td>
                   <td>${formatCurrency(sale.amount_paid)}</td>
-                  <td style="${sale.remaining_debt > 0 ? 'color: #dc2626; font-weight: bold;' : ''}">${formatCurrency(sale.remaining_debt)}</td>
+                  <td class="${sale.remaining_debt > 0 ? 'negative' : ''}">${formatCurrency(sale.remaining_debt)}</td>
                   <td>${new Date(sale.sale_date).toLocaleDateString(locale)}</td>
                 </tr>
               `).join('')}
@@ -302,7 +264,7 @@ export default function DashboardPage() {
           </table>
 
           ${report.charges.length > 0 ? `
-          <h2 style="margin-top: 30px; font-size: 18px;">${t('charges')}</h2>
+          <h2>${t('charges')}</h2>
           <table>
             <thead>
               <tr>
@@ -315,7 +277,7 @@ export default function DashboardPage() {
               ${report.charges.map(charge => `
                 <tr>
                   <td>${charge.name}</td>
-                  <td style="color: #dc2626;">${formatCurrency(charge.amount)}</td>
+                  <td class="negative">${formatCurrency(charge.amount)}</td>
                   <td>${new Date(charge.charge_date).toLocaleDateString(locale)}</td>
                 </tr>
               `).join('')}
@@ -361,11 +323,11 @@ export default function DashboardPage() {
               <strong>${formatCurrency(report.totalProfit)}</strong>
             </div>
             ${report.totalCharges > 0 ? `
-            <div class="summary-item" style="color: #dc2626;">
+            <div class="summary-item">
               <span>${t('totalCharges')}:</span>
-              <strong>-${formatCurrency(report.totalCharges)}</strong>
+              <strong class="negative">-${formatCurrency(report.totalCharges)}</strong>
             </div>
-            <div class="summary-item total" style="border-top: 2px solid #333; padding-top: 10px;">
+            <div class="summary-item total">
               <span>Net Profit:</span>
               <strong>${formatCurrency(report.netProfit)}</strong>
             </div>
@@ -376,9 +338,8 @@ export default function DashboardPage() {
             </div>
             `}
           </div>
-        </body>
-        </html>
-      `);
+        `,
+      }));
       
       printWindow.document.close();
       printWindow.focus();

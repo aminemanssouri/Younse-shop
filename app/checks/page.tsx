@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Plus, Pencil, Trash2, Eye, Download } from 'lucide-react';
-import { ClientCheck } from '@/lib/types';
+import { CheckStatus, ClientCheck } from '@/lib/types';
 import * as actions from '@/app/actions';
 import { useChecks } from '@/hooks/use-checks';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,18 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useLanguage } from '@/contexts/language-context';
 import { formatCurrency } from '@/lib/currency';
 import { buildAllChecksPdfHtml, buildSingleCheckPdfHtml, printHtmlDocument, CheckPdfLabels, CheckPdfRow } from '@/lib/check-pdf';
+
+const STATUS_STYLES: Record<CheckStatus, string> = {
+  pending: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300',
+  paid: 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300',
+  unpaid: 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300',
+};
+
+const STATUS_LABEL_KEYS: Record<CheckStatus, string> = {
+  pending: 'checkPending',
+  paid: 'checkPaid',
+  unpaid: 'checkUnpaid',
+};
 
 function formatCheckDate(value: string, locale: string) {
   const date = new Date(`${value.slice(0, 10)}T12:00:00`);
@@ -33,6 +45,15 @@ export default function ChecksPage() {
   const [toDate, setToDate] = useState('');
 
   const locale = language === 'ar' ? 'ar-MA' : language === 'fr' ? 'fr-FR' : 'en-GB';
+
+  const renderStatus = (status: CheckStatus | undefined) => {
+    const value = status || 'pending';
+    return (
+      <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_STYLES[value]}`}>
+        {t(STATUS_LABEL_KEYS[value])}
+      </span>
+    );
+  };
 
   const filteredChecks = checks.filter((check) => {
     const name = nameQuery.trim().toLowerCase();
@@ -185,6 +206,7 @@ export default function ChecksPage() {
                       <th className="text-left py-3 px-2">{t('checkBank')}</th>
                       <th className="text-left py-3 px-2">{t('checkNumber')}</th>
                       <th className="text-left py-3 px-2">{t('checkNotes')}</th>
+                      <th className="text-left py-3 px-2">{t('checkStatus')}</th>
                       <th className="text-left py-3 px-2">{t('actions')}</th>
                     </tr>
                   </thead>
@@ -197,6 +219,7 @@ export default function ChecksPage() {
                         <td className="py-3 px-2 text-muted-foreground">{check.bank || '-'}</td>
                         <td className="py-3 px-2 text-muted-foreground">{check.check_number || '-'}</td>
                         <td className="py-3 px-2 text-muted-foreground">{check.notes || '-'}</td>
+                        <td className="py-3 px-2">{renderStatus(check.status)}</td>
                         <td className="py-3 px-2">
                           <div className="flex gap-1">
                             <Button
@@ -277,6 +300,10 @@ export default function ChecksPage() {
               <div className="flex justify-between gap-4 border-b py-2">
                 <span className="text-muted-foreground">{t('checkNumber')}</span>
                 <span>{viewingCheck.check_number || '-'}</span>
+              </div>
+              <div className="flex justify-between gap-4 border-b py-2">
+                <span className="text-muted-foreground">{t('checkStatus')}</span>
+                {renderStatus(viewingCheck.status)}
               </div>
               <div className="py-2">
                 <div className="text-muted-foreground">{t('checkNotes')}</div>

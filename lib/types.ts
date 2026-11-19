@@ -97,6 +97,8 @@ export interface Charge {
   created_at: string;
 }
 
+export type CheckStatus = 'pending' | 'paid' | 'unpaid';
+
 export interface ClientCheck {
   id: number;
   client_name: string;
@@ -105,5 +107,6 @@ export interface ClientCheck {
   bank?: string | null;
   check_number?: string | null;
   notes?: string | null;
+  status: CheckStatus;
   created_at: string;
 }

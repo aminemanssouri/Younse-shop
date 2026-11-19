@@ -561,9 +561,9 @@ export async function getClientChecks(): Promise<ClientCheck[]> {
   return (data ?? []) as ClientCheck[];
 }
 
-export async function addClientCheck(data: Omit<ClientCheck, 'id' | 'created_at'>): Promise<void> {
+export async function addClientCheck(data: Omit<ClientCheck, 'id' | 'created_at' | 'status'>): Promise<void> {
   const supabase = getSupabaseAdmin();
-  const { error } = await supabase.from('client_checks').insert(data);
+  const { error } = await supabase.from('client_checks').insert({ ...data, status: 'pending' });
   if (error) throw new Error(error.message);
 }
 
